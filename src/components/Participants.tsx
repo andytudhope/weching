@@ -96,7 +96,7 @@ export function Participants({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-7 gap-2">
+              <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
                 {participant.numbers.map((num, nIndex) => (
                   <div
                     key={nIndex}

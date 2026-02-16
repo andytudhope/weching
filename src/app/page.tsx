@@ -1,26 +1,87 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { Download, Sparkles, Stars, Users } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { RitualGuidance } from "@/components/RitualGuidance";
-import { InquiryFormation } from "@/components/InquiryFormation";
-import { Participants, type Participant } from "@/components/Participants";
-import { HexagramDisplay } from "@/components/HexagramDisplay";
+import { useReducer, useMemo, useEffect, useState } from "react";
+import { ProgressBar } from "@/components/ProgressBar";
+import { StepTransition } from "@/components/StepTransition";
+import { Welcome } from "@/components/steps/Welcome";
+import { FormingTheQuestion } from "@/components/steps/FormingTheQuestion";
+import { Preparation } from "@/components/steps/Preparation";
+import { SeedMethod } from "@/components/steps/SeedMethod";
+import { CountingProcess } from "@/components/steps/CountingProcess";
+import { GroupCalculation } from "@/components/steps/GroupCalculation";
+import { Ceremony } from "@/components/steps/Ceremony";
+import { Results } from "@/components/steps/Results";
 import { getHexagramInfo } from "@/lib/hexagrams";
-import { exportSession, downloadMarkdown } from "@/lib/exportSession";
+import type { Participant } from "@/components/Participants";
+
+const TOTAL_STEPS = 8;
+const CEREMONY_STEP = 6;
+
+interface CeremonyState {
+  currentStep: number;
+  inquiry: string;
+  participants: Participant[];
+}
+
+type CeremonyAction =
+  | { type: "NEXT_STEP" }
+  | { type: "PREV_STEP" }
+  | { type: "GO_TO_STEP"; step: number }
+  | { type: "SET_INQUIRY"; inquiry: string }
+  | { type: "SET_PARTICIPANTS"; participants: Participant[] }
+  | { type: "RESET" };
+
+function ceremonyReducer(
+  state: CeremonyState,
+  action: CeremonyAction
+): CeremonyState {
+  switch (action.type) {
+    case "NEXT_STEP":
+      return {
+        ...state,
+        currentStep: Math.min(state.currentStep + 1, TOTAL_STEPS - 1),
+      };
+    case "PREV_STEP":
+      return { ...state, currentStep: Math.max(state.currentStep - 1, 0) };
+    case "GO_TO_STEP":
+      return { ...state, currentStep: action.step };
+    case "SET_INQUIRY":
+      return { ...state, inquiry: action.inquiry };
+    case "SET_PARTICIPANTS":
+      return { ...state, participants: action.participants };
+    case "RESET":
+      return { currentStep: 0, inquiry: "", participants: [] };
+    default:
+      return state;
+  }
+}
 
 export default function Home() {
-  const [inquiry, setInquiry] = useState("");
-  const [participants, setParticipants] = useState<Participant[]>([]);
-  const [showResults, setShowResults] = useState(false);
+  const [state, dispatch] = useReducer(ceremonyReducer, {
+    currentStep: 0,
+    inquiry: "",
+    participants: [],
+  });
+
+  const [isReturning, setIsReturning] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsReturning(
+        localStorage.getItem("hasCompletedGuidance") === "true"
+      );
+    }
+  }, []);
+
+  // Mark guidance as completed when reaching ceremony step
+  useEffect(() => {
+    if (state.currentStep === CEREMONY_STEP && typeof window !== "undefined") {
+      localStorage.setItem("hasCompletedGuidance", "true");
+      setIsReturning(true);
+    }
+  }, [state.currentStep]);
+
+  const { inquiry, participants, currentStep } = state;
 
   const groupLines = useMemo(() => {
     if (participants.length === 0)
@@ -66,170 +127,110 @@ export default function Home() {
 
   const canGenerate = participants.length > 0 && inquiry.trim().length > 0;
 
+  const next = () => dispatch({ type: "NEXT_STEP" });
+  const prev = () => dispatch({ type: "PREV_STEP" });
+  const goTo = (step: number) => dispatch({ type: "GO_TO_STEP", step });
+  const skipToCeremony = () => goTo(CEREMONY_STEP);
+
+  const renderStep = () => {
+    switch (currentStep) {
+      case 0:
+        return (
+          <Welcome
+            onBegin={next}
+            onSkip={skipToCeremony}
+            isReturning={isReturning}
+          />
+        );
+      case 1:
+        return (
+          <Preparation
+            onContinue={next}
+            onBack={prev}
+            onSkip={skipToCeremony}
+          />
+        );
+      case 2:
+        return (
+          <FormingTheQuestion
+            onContinue={next}
+            onBack={prev}
+            onSkip={skipToCeremony}
+          />
+        );
+      case 3:
+        return (
+          <SeedMethod
+            onContinue={next}
+            onBack={prev}
+            onSkip={skipToCeremony}
+          />
+        );
+      case 4:
+        return (
+          <CountingProcess
+            onContinue={next}
+            onBack={prev}
+            onSkip={skipToCeremony}
+          />
+        );
+      case 5:
+        return (
+          <GroupCalculation
+            onContinue={next}
+            onBack={prev}
+            onSkip={skipToCeremony}
+          />
+        );
+      case 6:
+        return (
+          <Ceremony
+            inquiry={inquiry}
+            participants={participants}
+            onInquiryChange={(v) =>
+              dispatch({ type: "SET_INQUIRY", inquiry: v })
+            }
+            onParticipantsChange={(p) =>
+              dispatch({ type: "SET_PARTICIPANTS", participants: p })
+            }
+            onGenerate={next}
+            onBack={prev}
+            canGenerate={canGenerate}
+          />
+        );
+      case 7:
+        return (
+          <Results
+            inquiry={inquiry}
+            participants={participants}
+            groupLines={groupLines}
+            futureLines={futureLines}
+            changingLine={changingLine}
+            presentHexagram={presentHexagram}
+            futureHexagram={futureHexagram}
+            participantHexagrams={participantHexagrams}
+            onNewCeremony={() => dispatch({ type: "RESET" })}
+            onModify={() => goTo(CEREMONY_STEP)}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-warm">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-serif font-bold text-primary mb-2">
-              co-inquiry: group i ching
-            </h1>
-            <p className="text-lg text-muted-foreground font-serif">
-              collective inquiry through ancient wisdom
-            </p>
-          </div>
-
-          <div className="grid lg:grid-cols-4 gap-6">
-            <div className="lg:col-span-1">
-              <RitualGuidance />
-            </div>
-
-            <div className="lg:col-span-3 space-y-6">
-              <InquiryFormation
-                inquiry={inquiry}
-                onInquiryChange={setInquiry}
-              />
-
-              <Card className="bg-card border-border shadow-soft">
-                <CardHeader>
-                  <CardTitle className="font-serif text-primary flex items-center">
-                    <Users className="w-5 h-5 mr-2" />
-                    Participants
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Participants
-                    participants={participants}
-                    onParticipantsChange={setParticipants}
-                  />
-                </CardContent>
-              </Card>
-
-              {canGenerate && (
-                <div className="text-center">
-                  <Button
-                    onClick={() => setShowResults(true)}
-                    size="lg"
-                    className="px-8 py-3 font-serif text-lg shadow-warm hover:shadow-meditation transition-all duration-300"
-                  >
-                    <Sparkles className="w-5 h-5 mr-2" />
-                    Generate Co-Inquiry
-                  </Button>
-                </div>
-              )}
-
-              {showResults && (
-                <Card className="bg-card border-border shadow-meditation">
-                  <CardHeader>
-                    <CardTitle className="font-serif text-primary text-center flex items-center justify-center">
-                      <Stars className="w-5 h-5 mr-2" />
-                      Co-Inquiry Results
-                      <Users className="w-5 h-5 ml-2" />
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {inquiry && (
-                      <div className="mb-6 p-4 bg-meditation-glow rounded-lg">
-                        <h3 className="font-serif font-medium text-primary mb-2">
-                          Your Inquiry:
-                        </h3>
-                        <p className="font-serif text-foreground/80 italic">
-                          &ldquo;{inquiry}&rdquo;
-                        </p>
-                      </div>
-                    )}
-
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <HexagramDisplay
-                        lines={groupLines}
-                        title="Present Situation"
-                        changingLine={changingLine - 1}
-                        hexagramNumber={presentHexagram.number}
-                        hexagramName={presentHexagram.name}
-                        hexagramUrl={presentHexagram.url}
-                      />
-                      <HexagramDisplay
-                        lines={futureLines}
-                        title="Future Influence"
-                        changingLine={-1}
-                        hexagramNumber={futureHexagram.number}
-                        hexagramName={futureHexagram.name}
-                        hexagramUrl={futureHexagram.url}
-                      />
-                    </div>
-
-                    <Separator className="my-6" />
-
-                    <h4 className="font-serif font-medium text-primary text-center mb-4">
-                      Individual Hexagrams
-                    </h4>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-6">
-                      {participantHexagrams.map((ph, i) => (
-                        <HexagramDisplay
-                          key={i}
-                          lines={ph.lines}
-                          title={ph.name}
-                          changingLine={-1}
-                          hexagramNumber={ph.info.number}
-                          hexagramName={ph.info.name}
-                          hexagramUrl={ph.info.url}
-                          compact
-                        />
-                      ))}
-                    </div>
-
-                    <Separator className="my-6" />
-
-                    <div className="text-center space-y-3">
-                      <p className="font-serif text-muted-foreground">
-                        <strong>Changing Line:</strong> Line {changingLine}{" "}
-                        transforms the hexagram
-                      </p>
-                      <p className="font-serif text-sm text-muted-foreground">
-                        {participants.length} participants contributed to this
-                        co-inquiry
-                      </p>
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          const md = exportSession({
-                            inquiry,
-                            participants,
-                            presentHexagram,
-                            futureHexagram,
-                            groupLines,
-                            futureLines,
-                            changingLine,
-                            participantHexagrams,
-                          });
-                          const date = new Date()
-                            .toISOString()
-                            .slice(0, 10);
-                          downloadMarkdown(md, `co-inquiry-${date}.md`);
-                        }}
-                        className="font-serif"
-                      >
-                        <Download className="w-4 h-4 mr-2" />
-                        Export Session
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          </div>
-
-          <div className="mt-16 pt-8 border-t border-border">
-            <div className="text-center space-y-2">
-              <p className="text-sm text-muted-foreground font-serif">
-                <strong>Co-Inquiry: Group I Ching</strong> - collective inquiry
-                through ancient wisdom
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Licensed under GNU AGPL v3.0
-              </p>
-            </div>
-          </div>
+      <ProgressBar currentStep={currentStep} totalSteps={TOTAL_STEPS} />
+      <StepTransition stepKey={currentStep}>{renderStep()}</StepTransition>
+      <div className="py-8 border-t border-border">
+        <div className="text-center space-y-2">
+          <p className="text-sm text-muted-foreground font-serif">
+            <strong>Co-Inquiry: Group I Ching</strong> — collective inquiry
+            through ancient wisdom
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Licensed under GNU AGPL v3.0
+          </p>
         </div>
       </div>
     </div>

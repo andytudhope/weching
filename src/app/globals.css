@@ -153,3 +153,25 @@
 .hover\:shadow-meditation:hover {
   box-shadow: var(--shadow-meditation);
 }
+
+/* Step transitions */
+.step-transition {
+  will-change: opacity, transform;
+}
+
+.step-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 600ms ease-in, transform 600ms ease-in;
+}
+
+.step-enter {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.step-exit {
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 400ms ease-out, transform 400ms ease-out;
+}
