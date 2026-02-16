@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Sparkles, Stars, Users } from "lucide-react";
+import { Download, Sparkles, Stars, Users } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -15,6 +15,7 @@ import { InquiryFormation } from "@/components/InquiryFormation";
 import { Participants, type Participant } from "@/components/Participants";
 import { HexagramDisplay } from "@/components/HexagramDisplay";
 import { getHexagramInfo } from "@/lib/hexagrams";
+import { exportSession, downloadMarkdown } from "@/lib/exportSession";
 
 export default function Home() {
   const [inquiry, setInquiry] = useState("");
@@ -188,6 +189,29 @@ export default function Home() {
                         {participants.length} participants contributed to this
                         co-inquiry
                       </p>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          const md = exportSession({
+                            inquiry,
+                            participants,
+                            presentHexagram,
+                            futureHexagram,
+                            groupLines,
+                            futureLines,
+                            changingLine,
+                            participantHexagrams,
+                          });
+                          const date = new Date()
+                            .toISOString()
+                            .slice(0, 10);
+                          downloadMarkdown(md, `co-inquiry-${date}.md`);
+                        }}
+                        className="font-serif"
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        Export Session
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
