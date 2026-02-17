@@ -58,24 +58,29 @@ export function Ceremony({
             </CardContent>
           </Card>
 
-          <div className="flex items-center justify-between pt-4">
-            <Button
-              variant="ghost"
-              onClick={onBack}
-              className="font-serif text-muted-foreground hover:text-foreground"
-            >
-              Review Guidance
-            </Button>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
+            <div className="order-2 sm:order-1">
+              <Button
+                variant="ghost"
+                onClick={onBack}
+                className="font-serif text-muted-foreground hover:text-foreground"
+              >
+                Review Guidance
+              </Button>
+            </div>
 
-            <Button
-              onClick={onGenerate}
-              disabled={!canGenerate}
-              size="lg"
-              className="px-8 font-serif text-lg shadow-warm hover:shadow-meditation transition-all duration-300 disabled:opacity-50"
-            >
-              <Sparkles className="w-5 h-5 mr-2" />
-              Generate Co-Inquiry
-            </Button>
+            {canGenerate && (
+              <div className="order-1 sm:order-2">
+                <Button
+                  onClick={onGenerate}
+                  size="lg"
+                  className="px-8 font-serif text-lg shadow-warm hover:shadow-meditation transition-all duration-300"
+                >
+                  <Sparkles className="w-5 h-5 mr-2" />
+                  Generate Co-Inquiry
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>

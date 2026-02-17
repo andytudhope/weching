@@ -26,7 +26,7 @@ export function CountingProcess({
         </p>
         <p className="text-foreground/80 font-serif">
           Keep each pile distinct throughout the process. Record your 7 numbers
-          (6 pile counts + 1 changing line pile) and enter them in the next step.
+          (6 pile counts + 1 changing line pile) and enter them when prompted.
         </p>
       </div>
     </StepLayout>

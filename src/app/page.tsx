@@ -125,7 +125,7 @@ export default function Home() {
     [participants]
   );
 
-  const canGenerate = participants.length > 0 && inquiry.trim().length > 0;
+  const canGenerate = participants.length >= 2 && inquiry.trim().length > 0;
 
   const next = () => dispatch({ type: "NEXT_STEP" });
   const prev = () => dispatch({ type: "PREV_STEP" });
@@ -179,7 +179,6 @@ export default function Home() {
           <GroupCalculation
             onContinue={next}
             onBack={prev}
-            onSkip={skipToCeremony}
           />
         );
       case 6:

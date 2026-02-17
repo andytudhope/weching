@@ -3,19 +3,17 @@ import { StepLayout } from "@/components/StepLayout";
 interface GroupCalculationProps {
   onContinue: () => void;
   onBack: () => void;
-  onSkip: () => void;
 }
 
 export function GroupCalculation({
   onContinue,
   onBack,
-  onSkip,
 }: GroupCalculationProps) {
   return (
     <StepLayout
       onContinue={onContinue}
       onBack={onBack}
-      onSkip={onSkip}
+      showSkip={false}
       continueLabel="Proceed to Ceremony"
     >
       <h2 className="text-2xl font-serif tracking-wide text-primary text-center">

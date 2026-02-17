@@ -42,11 +42,16 @@ export function SeedMethod({ onContinue, onBack, onSkip }: SeedMethodProps) {
             odd or even count:
           </p>
           <ul className="text-foreground/80 font-serif space-y-2 ml-6">
-            <li>
-              <strong>Odd number</strong> = Yang (solid line) ——
+            <li className="flex items-center gap-2 flex-wrap">
+              <strong>Odd number</strong> = Yang (solid line)
+              <span className="inline-block w-8 h-0.5 bg-primary rounded-full" />
             </li>
-            <li>
-              <strong>Even number</strong> = Yin (broken line) — —
+            <li className="flex items-center gap-2 flex-wrap">
+              <strong>Even number</strong> = Yin (broken line)
+              <span className="inline-flex items-center gap-1">
+                <span className="inline-block w-3 h-0.5 bg-primary rounded-full" />
+                <span className="inline-block w-3 h-0.5 bg-primary rounded-full" />
+              </span>
             </li>
             <li>Line 1 at bottom, counting up to Line 6 at top</li>
           </ul>

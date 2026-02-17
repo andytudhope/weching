@@ -33,8 +33,6 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --color-warm-stone: var(--warm-stone);
-  --color-warm-stone-foreground: var(--warm-stone-foreground);
   --color-meditation-glow: var(--meditation-glow);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -69,8 +67,6 @@
   --border: hsl(42 40% 88%);
   --input: hsl(45 50% 95%);
   --ring: hsl(35 40% 25%);
-  --warm-stone: hsl(35 15% 80%);
-  --warm-stone-foreground: hsl(35 15% 30%);
   --meditation-glow: hsl(45 100% 92%);
   --gradient-warm: linear-gradient(135deg, hsl(48 100% 96%), hsl(42 80% 90%));
   --gradient-subtle: linear-gradient(45deg, hsl(45 100% 98%), hsl(42 60% 94%));
@@ -104,8 +100,6 @@
   --border: hsl(217.2 32.6% 17.5%);
   --input: hsl(217.2 32.6% 17.5%);
   --ring: hsl(212.7 26.8% 83.9%);
-  --warm-stone: hsl(35 15% 30%);
-  --warm-stone-foreground: hsl(35 15% 80%);
   --meditation-glow: hsl(45 30% 15%);
 }
 
@@ -124,34 +118,6 @@
 
 .bg-gradient-subtle {
   background-image: var(--gradient-subtle);
-}
-
-.bg-warm-stone {
-  background-color: var(--warm-stone);
-}
-
-.text-warm-stone-foreground {
-  color: var(--warm-stone-foreground);
-}
-
-.bg-meditation-glow {
-  background-color: var(--meditation-glow);
-}
-
-.shadow-soft {
-  box-shadow: var(--shadow-soft);
-}
-
-.shadow-warm {
-  box-shadow: var(--shadow-warm);
-}
-
-.shadow-meditation {
-  box-shadow: var(--shadow-meditation);
-}
-
-.hover\:shadow-meditation:hover {
-  box-shadow: var(--shadow-meditation);
 }
 
 /* Step transitions */

@@ -12,6 +12,14 @@ export function StepTransition({ stepKey, children }: StepTransitionProps) {
   const [displayedKey, setDisplayedKey] = useState(stepKey);
   const [displayedChildren, setDisplayedChildren] = useState(children);
 
+  // Always keep displayed children in sync when the step hasn't changed
+  // This ensures controlled inputs (textareas, inputs) reflect current state
+  useEffect(() => {
+    if (stepKey === displayedKey) {
+      setDisplayedChildren(children);
+    }
+  }, [children, stepKey, displayedKey]);
+
   useEffect(() => {
     if (stepKey === displayedKey) return;
 
@@ -22,6 +30,9 @@ export function StepTransition({ stepKey, children }: StepTransitionProps) {
       setDisplayedKey(stepKey);
       setDisplayedChildren(children);
       setPhase("enter");
+
+      // Scroll to top when transitioning to a new step
+      window.scrollTo(0, 0);
 
       const visibleTimer = setTimeout(() => {
         setPhase("visible");

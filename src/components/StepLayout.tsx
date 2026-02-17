@@ -31,8 +31,8 @@ export function StepLayout({
         <div className="max-w-2xl mx-auto w-full">
           <div className="text-base leading-relaxed space-y-6">{children}</div>
 
-          <div className="mt-12 flex items-center justify-between">
-            <div className="w-1/3">
+          <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="order-3 sm:order-1 sm:w-1/3">
               {showBack && onBack && (
                 <Button
                   variant="ghost"
@@ -45,7 +45,7 @@ export function StepLayout({
               )}
             </div>
 
-            <div className="w-1/3 flex justify-center">
+            <div className="order-1 sm:order-2 sm:w-1/3 flex justify-center">
               {showContinue && onContinue && (
                 <Button
                   onClick={onContinue}
@@ -58,11 +58,11 @@ export function StepLayout({
               )}
             </div>
 
-            <div className="w-1/3 flex justify-end">
+            <div className="order-2 sm:order-3 sm:w-1/3 flex justify-center sm:justify-end">
               {showSkip && onSkip && (
                 <button
                   onClick={onSkip}
-                  className="font-serif text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 underline underline-offset-4 decoration-muted-foreground/30"
+                  className="font-serif text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 underline underline-offset-4 decoration-muted-foreground/30 whitespace-nowrap"
                 >
                   Skip to Ceremony &rarr;
                 </button>
