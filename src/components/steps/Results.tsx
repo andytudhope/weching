@@ -12,12 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { HexagramDisplay } from "@/components/HexagramDisplay";
 import { exportSession, downloadMarkdown } from "@/lib/exportSession";
 import type { Participant } from "@/components/Participants";
-
-interface HexagramInfo {
-  number: number;
-  name: string;
-  url: string;
-}
+import type { HexagramInfo } from "@/lib/hexagrams";
 
 interface ResultsProps {
   inquiry: string;

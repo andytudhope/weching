@@ -1,9 +1,10 @@
 // Trigram encoding (3 lines bottom-to-top, yang=1 yin=0 → 3-bit number):
+// The low bit is the bottom line and the high bit is the top line.
 //   7 (111) = Ch'ien (Heaven)
 //   0 (000) = K'un   (Earth)
-//   4 (100) = Chên   (Thunder)
+//   1 (001) = Chên   (Thunder)
 //   2 (010) = K'an   (Water)
-//   1 (001) = Kên    (Mountain)
+//   4 (100) = Kên    (Mountain)
 //   6 (110) = Sun    (Wind)
 //   5 (101) = Li     (Fire)
 //   3 (011) = Tui    (Lake)
@@ -11,17 +12,17 @@
 // HEXAGRAM_LOOKUP[lower][upper] → hexagram number (1-64)
 // Both indices are trigram bit values (0-7)
 const HEXAGRAM_LOOKUP: number[][] = [
-  //              K'un  Kên   K'an  Tui   Chên  Li    Sun   Ch'ien
+  //              K'un  Chên  K'an  Tui   Kên   Li    Sun   Ch'ien
   //  upper:       0     1     2     3     4     5     6     7
   // lower:
-  /* 0 K'un   */ [2, 23, 8, 45, 16, 35, 20, 12],
-  /* 1 Kên    */ [15, 52, 39, 31, 62, 56, 53, 33],
-  /* 2 K'an   */ [7, 4, 29, 47, 40, 64, 59, 6],
-  /* 3 Tui    */ [19, 41, 60, 58, 54, 38, 61, 10],
-  /* 4 Chên   */ [24, 27, 3, 17, 51, 21, 42, 25],
-  /* 5 Li     */ [36, 22, 63, 49, 55, 30, 37, 13],
-  /* 6 Sun    */ [46, 18, 48, 28, 32, 50, 57, 44],
-  /* 7 Ch'ien */ [11, 26, 5, 43, 34, 14, 9, 1],
+  /* 0 K'un   */ [2, 16, 8, 45, 23, 35, 20, 12],
+  /* 1 Chên   */ [24, 51, 3, 17, 27, 21, 42, 25],
+  /* 2 K'an   */ [7, 40, 29, 47, 4, 64, 59, 6],
+  /* 3 Tui    */ [19, 54, 60, 58, 41, 38, 61, 10],
+  /* 4 Kên    */ [15, 62, 39, 31, 52, 56, 53, 33],
+  /* 5 Li     */ [36, 55, 63, 49, 22, 30, 37, 13],
+  /* 6 Sun    */ [46, 32, 48, 28, 18, 50, 57, 44],
+  /* 7 Ch'ien */ [11, 34, 5, 43, 26, 14, 9, 1],
 ];
 
 const HEXAGRAM_NAMES: Record<number, string> = {
@@ -99,11 +100,13 @@ function trigramBits(lines: boolean[]): number {
   );
 }
 
-export function getHexagramInfo(lines: boolean[]): {
+export interface HexagramInfo {
   number: number;
   name: string;
   url: string;
-} {
+}
+
+export function getHexagramInfo(lines: boolean[]): HexagramInfo {
   const lower = trigramBits(lines.slice(0, 3));
   const upper = trigramBits(lines.slice(3, 6));
   const num = HEXAGRAM_LOOKUP[lower][upper];
@@ -112,4 +115,24 @@ export function getHexagramInfo(lines: boolean[]): {
     name: HEXAGRAM_NAMES[num],
     url: `https://jamesdekorne.com/GBCh/hex${num}.htm`,
   };
+}
+
+// Reverse lookup: given a hexagram number (1-64), return its 6-bit line array
+// lines[0] = line 1 (bottom), lines[5] = line 6 (top)
+export function hexagramNumberToLines(num: number): boolean[] {
+  for (let lower = 0; lower < 8; lower++) {
+    for (let upper = 0; upper < 8; upper++) {
+      if (HEXAGRAM_LOOKUP[lower][upper] === num) {
+        return [
+          !!(lower & 1),
+          !!(lower & 2),
+          !!(lower & 4),
+          !!(upper & 1),
+          !!(upper & 2),
+          !!(upper & 4),
+        ];
+      }
+    }
+  }
+  throw new Error(`Invalid hexagram number: ${num}`);
 }

@@ -1,0 +1,3 @@
+weching.honour.community {
+    reverse_proxy app:3000
+}

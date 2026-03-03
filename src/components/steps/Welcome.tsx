@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 interface WelcomeProps {
@@ -52,6 +53,12 @@ export function Welcome({ onBegin, onSkip, isReturning }: WelcomeProps) {
               Skip to Ceremony &rarr;
             </button>
           )}
+          <Link
+            href="/thread"
+            className="font-serif text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors duration-200"
+          >
+            thread of selves →
+          </Link>
         </div>
       </div>
     </div>

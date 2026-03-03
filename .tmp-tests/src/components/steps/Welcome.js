@@ -1,0 +1,12 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Welcome = Welcome;
+const jsx_runtime_1 = require("react/jsx-runtime");
+const link_1 = __importDefault(require("next/link"));
+const button_1 = require("@/components/ui/button");
+function Welcome({ onBegin, onSkip, isReturning }) {
+    return ((0, jsx_runtime_1.jsx)("div", { className: "min-h-screen flex items-center justify-center px-4", children: (0, jsx_runtime_1.jsxs)("div", { className: "max-w-2xl mx-auto text-center space-y-8", children: [(0, jsx_runtime_1.jsxs)("div", { className: "space-y-4", children: [(0, jsx_runtime_1.jsx)("h1", { className: "text-4xl font-serif font-bold text-primary tracking-wide", children: "co-inquiry: group i ching" }), (0, jsx_runtime_1.jsx)("p", { className: "text-lg text-muted-foreground font-serif leading-relaxed", children: "collective inquiry through ancient wisdom" })] }), (0, jsx_runtime_1.jsx)("div", { className: "space-y-3 pt-4", children: (0, jsx_runtime_1.jsx)("p", { className: "text-base text-foreground/80 font-serif leading-relaxed max-w-lg mx-auto", children: "This ritual guides a group through the seed method of I Ching divination. While approaching the I Ching is traditionally a solitary practice, our time calls for a return to deeper relating. We offer this co-inquiring method with great respect for those who walk before us." }) }), (0, jsx_runtime_1.jsxs)("div", { className: "flex flex-col items-center gap-4 pt-8", children: [(0, jsx_runtime_1.jsx)(button_1.Button, { onClick: onBegin, size: "lg", className: "px-10 py-6 font-serif text-lg shadow-warm hover:shadow-meditation transition-all duration-300", children: "Begin the Ritual" }), isReturning ? ((0, jsx_runtime_1.jsx)(button_1.Button, { variant: "secondary", onClick: onSkip, className: "font-serif", children: "Skip to Ceremony \u2192" })) : ((0, jsx_runtime_1.jsx)("button", { onClick: onSkip, className: "font-serif text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 underline underline-offset-4 decoration-muted-foreground/30", children: "Skip to Ceremony \u2192" })), (0, jsx_runtime_1.jsx)(link_1.default, { href: "/thread", className: "font-serif text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors duration-200", children: "thread of selves \u2192" })] })] }) }));
+}

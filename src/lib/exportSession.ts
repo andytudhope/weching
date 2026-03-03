@@ -1,8 +1,4 @@
-interface HexagramInfo {
-  number: number;
-  name: string;
-  url: string;
-}
+import type { HexagramInfo } from "./hexagrams";
 
 interface SessionData {
   inquiry: string;

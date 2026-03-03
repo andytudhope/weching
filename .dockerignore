@@ -1,0 +1,10 @@
+.git
+.github
+.next
+node_modules
+data
+.tmp-tests
+deploy
+tests
+*.md
+.env*
