@@ -53,3 +53,13 @@ The application tracks two Hamming weights simultaneously: the weight of the cur
 It is not simply an extreme version of w=4, nor a lesser form of w=6. In the geometry of the hypercube, w=5 is the complement of w=1: where a single-line change is the most precise possible move, a five-line change is the most total possible move that still falls short of complete inversion. The one line that holds is the axis around which everything else has turned.
 
 There is no resonant King Wen moment for a w=5 reading — no day in the cycle when the sequence itself moves this way. The question such a reading poses is not "where does this transformation appear in the traditional path?" but rather "what does it mean to be in a transformation the tradition has never traversed?" It is a situation the sequence cannot accompany you through — which may itself be the reading's first instruction.
+
+# Visualisation Possibilities
+
+Each hexagram is a pair (lower trigram, upper trigram), each from {0,…,7}. The King Wen sequence is a Hamiltonian path through an 8×8 grid. This is lossless, two-dimensional, and meaningful: rows = inner state, columns = outer state. The path jumps around the grid in a pattern shaped by the semantic organisation. FOD weight naturally colours the transitions. This visualisation preserves all the structure.
+
+The King Wen sequence, despite having access to 6 dimensions and all 15 rotation planes, almost never uses them freely. It's constrained to even weights most of the time (pair structure theorem), uses w=1 only twice, never uses w=5, and uses w=6 only for complement pairs. The path explores a very sparse subset of the possible motions through the hypercube. That selectivity is arguably what makes it structurally interesting — it's not a random Hamiltonian path, it's a highly constrained one.
+
+### Walsh-Hadamard / Fourier on Z₂⁶
+
+The hypercube has a natural Fourier theory: the 64 Walsh functions, one per hexagram. You can ask which "frequencies" the King Wen path emphasises — i.e., which dimensions flip most versus least. This is less visual but reveals the statistical structure of the path. We may use this to pair hexagrams with music at some later point.

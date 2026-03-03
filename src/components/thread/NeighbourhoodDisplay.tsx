@@ -11,6 +11,7 @@ import {
 } from "@/lib/kingwen";
 import { hexagramNumberToLines, getHexagramInfo } from "@/lib/hexagrams";
 import { xorHexagrams, trigramCharacter } from "@/lib/operators";
+import { TrigramGrid } from "@/components/TrigramGrid";
 
 // ——— Sub-components ———
 
@@ -334,6 +335,10 @@ export function NeighbourhoodDisplay({ today }: NeighbourhoodDisplayProps) {
               Hamiltonian path). The First Order of Difference (FOD) at each step is the number of
               lines that change. {getFodDistributionSummary()}
             </p>
+
+            <div className="pt-1">
+              <TrigramGrid today={today} />
+            </div>
 
             <p>
               <strong className="text-primary">Why 384 days.</strong>{" "}
