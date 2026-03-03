@@ -37,6 +37,14 @@ function derivedFromDurations(durations: number[]) {
   return { lines, changingLine };
 }
 
+// ——— Seed math ———
+function derivedFromSeeds(seeds: number[]) {
+  const lines = seeds.slice(0, 6).map((n) => n % 2 === 1);
+  const total = seeds[6] % 6;
+  const changingLine = total === 0 ? 6 : total;
+  return { lines, changingLine };
+}
+
 function todayString(): string {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -52,7 +60,7 @@ const LINE_LABELS = [
   "The Changing Line",
 ];
 
-type View = "list" | "inquiry" | "ready" | "holding" | "revealed" | "complete";
+type View = "list" | "inquiry" | "ready" | "holding" | "revealed" | "complete" | "seeds" | "seeds-complete";
 
 interface TimingRitualProps {
   readings: TemporalReading[];
@@ -79,6 +87,11 @@ export function TimingRitual({
   const [date, setDate] = useState(todayString());
   const [label, setLabel] = useState("");
   const [saving, setSaving] = useState(false);
+
+  // Method selection & seed inputs
+  const [method, setMethod] = useState<"timing" | "seeds">("timing");
+  const [seedInputs, setSeedInputs] = useState<string[]>(["", "", "", "", "", "", ""]);
+  const [finalSeeds, setFinalSeeds] = useState<number[]>([]);
 
   const pressStartRef = useRef<number | null>(null);
   const advanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -151,6 +164,27 @@ export function TimingRitual({
       });
       setDurations([]);
       setLineIndex(0);
+      setInquiry("");
+      setLabel("");
+      setDate(todayString());
+      setView("list");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleAcceptSeeds(seeds: number[]) {
+    setSaving(true);
+    try {
+      const { lines, changingLine } = derivedFromSeeds(seeds);
+      await onSave({
+        date,
+        inquiry: inquiry.trim() || undefined,
+        label: label.trim() || undefined,
+        lines,
+        changingLine,
+      });
+      setSeedInputs(["", "", "", "", "", "", ""]);
       setInquiry("");
       setLabel("");
       setDate(todayString());
@@ -295,9 +329,40 @@ export function TimingRitual({
           </div>
         </div>
 
+        {/* Method selection */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => setMethod("timing")}
+            className={`flex-1 py-2 rounded-lg font-serif text-sm border transition-colors ${
+              method === "timing"
+                ? "bg-primary text-primary-foreground border-primary"
+                : "border-border text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            timing
+          </button>
+          <button
+            onClick={() => setMethod("seeds")}
+            className={`flex-1 py-2 rounded-lg font-serif text-sm border transition-colors ${
+              method === "seeds"
+                ? "bg-primary text-primary-foreground border-primary"
+                : "border-border text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            seeds
+          </button>
+        </div>
+
         <div className="flex flex-col items-center gap-3">
           <Button
-            onClick={startRitual}
+            onClick={() => {
+              if (method === "seeds") {
+                setSeedInputs(["", "", "", "", "", "", ""]);
+                setView("seeds");
+              } else {
+                startRitual();
+              }
+            }}
             size="lg"
             className="font-serif shadow-warm hover:shadow-meditation transition-all duration-300"
           >
@@ -426,7 +491,113 @@ export function TimingRitual({
     );
   }
 
-  // ——— COMPLETE ———
+  // ——— SEEDS ———
+  if (view === "seeds") {
+    const valid = seedInputs.every((s) => s !== "" && !isNaN(parseInt(s, 10)));
+    return (
+      <div className="max-w-lg mx-auto w-full space-y-6 px-4">
+        <div className="text-center space-y-2">
+          <p className="text-sm font-serif text-muted-foreground uppercase tracking-widest">
+            seed method
+          </p>
+          <h3 className="text-xl font-serif font-semibold text-primary">
+            Enter your pile counts
+          </h3>
+          <p className="text-sm font-serif text-muted-foreground">
+            Lines 1–6, then your moving-line seed.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-4 gap-3">
+          {seedInputs.map((v, i) => (
+            <div key={i} className="space-y-1">
+              <label className="text-xs font-serif text-muted-foreground block text-center">
+                {i < 6 ? `line ${i + 1}` : "moving"}
+              </label>
+              <Input
+                type="number"
+                value={v}
+                onChange={(e) => {
+                  const n = [...seedInputs];
+                  n[i] = e.target.value;
+                  setSeedInputs(n);
+                }}
+                className="font-serif text-center"
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="flex flex-col items-center gap-3">
+          <Button
+            disabled={!valid}
+            onClick={() => {
+              const seeds = seedInputs.map((s) => parseInt(s, 10));
+              setFinalSeeds(seeds);
+              setView("seeds-complete");
+            }}
+            size="lg"
+            className="font-serif shadow-warm hover:shadow-meditation transition-all duration-300"
+          >
+            Cast →
+          </Button>
+          <button
+            onClick={() => setView("inquiry")}
+            className="text-sm font-serif text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4"
+          >
+            ← change inquiry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ——— SEEDS COMPLETE ———
+  if (view === "seeds-complete") {
+    const { lines: sLines, changingLine: sCL } = derivedFromSeeds(finalSeeds);
+    const sInfo = getHexagramInfo(sLines);
+    return (
+      <div className="max-w-lg mx-auto w-full space-y-6 px-4 text-center">
+        <div className="space-y-1">
+          <p className="text-sm font-serif text-muted-foreground uppercase tracking-widest">
+            reading complete
+          </p>
+          <h3 className="text-2xl font-serif font-semibold text-primary">
+            {sInfo.name}
+          </h3>
+          {inquiry && (
+            <p className="text-sm font-serif text-foreground/60 italic">
+              &ldquo;{inquiry}&rdquo;
+            </p>
+          )}
+        </div>
+        <div className="flex justify-center">
+          <HexagramDisplay
+            lines={sLines}
+            title={`Hexagram ${sInfo.number}`}
+            changingLine={sCL - 1}
+            hexagramNumber={sInfo.number}
+            hexagramName={sInfo.name}
+            hexagramUrl={sInfo.url}
+          />
+        </div>
+        <div className="flex justify-center gap-4">
+          <Button variant="outline" onClick={() => setView("seeds")} className="font-serif">
+            Try Again
+          </Button>
+          <Button
+            onClick={() => handleAcceptSeeds(finalSeeds)}
+            disabled={saving}
+            className="font-serif shadow-warm"
+          >
+            {saving ? "Saving…" : "Accept & Save"}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // ——— COMPLETE (timing) ———
   const { lines, changingLine } = derivedFromDurations(durations);
   const info = getHexagramInfo(lines);
 

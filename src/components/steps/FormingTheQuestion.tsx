@@ -42,7 +42,9 @@ export function FormingTheQuestion({
           </p>
           <p className="text-foreground/80 font-serif">
             The process is intentionally messy and non-linear — conversation and
-            synthesis are key.
+            synthesis are key. This app will keep your fragments, reflections, thoughts 
+            and questions safe untul you have reached a good enough question that the whole 
+            group is happy to put to the I Ching.
           </p>
         </div>
 

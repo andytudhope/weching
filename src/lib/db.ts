@@ -34,6 +34,14 @@ db.exec(`
     durations TEXT,
     created_at INTEGER NOT NULL
   );
+
+  CREATE TABLE IF NOT EXISTS circles (
+    id           TEXT    PRIMARY KEY,
+    created_at   INTEGER NOT NULL,
+    inquiry      TEXT,
+    fragments    TEXT    NOT NULL DEFAULT '[]',
+    participants TEXT    NOT NULL DEFAULT '[]'
+  );
 `);
 
 export default db;

@@ -12,7 +12,7 @@ export function SeedMethod({ onContinue, onBack, onSkip }: SeedMethodProps) {
     <StepLayout onContinue={onContinue} onBack={onBack} onSkip={onSkip}>
       <h2 className="text-2xl font-serif tracking-wide text-primary flex items-center justify-center">
         <Hand className="w-6 h-6 mr-3" />
-        The Seed Method
+        The Method
       </h2>
 
       <div className="space-y-6">
@@ -21,7 +21,7 @@ export function SeedMethod({ onContinue, onBack, onSkip }: SeedMethodProps) {
             Pinch Technique
           </h3>
           <p className="text-foreground/80 font-serif">
-            The core action: focused, contemplative gathering of piles in a flow
+            The core action: focused, contemplative gathering of piles of seeds in a flow
             state. Take each pinch with thumb, index, and middle fingers (other
             fingers supporting).
           </p>
@@ -70,6 +70,17 @@ export function SeedMethod({ onContinue, onBack, onSkip }: SeedMethodProps) {
             <li>Divide by 6, remainder = changing line</li>
             <li>If remainder is 0, changing line is 6</li>
           </ul>
+        </div>
+
+        <div className="space-y-4">
+          <h3 className="text-lg font-serif font-medium text-primary">
+            Digital Technique
+          </h3>
+          <p className="text-foreground/80 font-serif">
+            Click/press and hold the screen in the same focused, 
+            contemplative flow state. This action is timed. The first four signficant digits are 
+            added together. If odd, a yang line is returned. If even, a yin line is returned.
+          </p>
         </div>
       </div>
     </StepLayout>

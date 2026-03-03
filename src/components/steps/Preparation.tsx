@@ -37,12 +37,12 @@ export function Preparation({ onContinue, onBack, onSkip }: PreparationProps) {
           </h3>
           <p className="text-foreground/80 font-serif">
             Prepare a small dish with seeds approximately the size of rice
-            grains. Rice works well, or any seeds that are easy to manipulate and
-            count without difficulty.
+            grains. Rice can works. Some of us prefer coriander seeds. 
+            Any seeds that are easy to manipulate and count will work.
           </p>
           <p className="text-foreground/80 font-serif">
-            Seeds that are too small make counting challenging. Focus on odd/even
-            totals rather than exact counts.
+            We also offer an alternative, digital method in case you can't find 
+            seeds or rice, so don't worry.
           </p>
         </div>
       </div>

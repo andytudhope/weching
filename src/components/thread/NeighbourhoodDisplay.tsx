@@ -212,9 +212,7 @@ export function NeighbourhoodDisplay({ today }: NeighbourhoodDisplayProps) {
         </h3>
         <p className="text-xs font-serif text-muted-foreground mt-1">
           The I Ching&apos;s 64 hexagrams form a 6-dimensional hypercube — a space of possible states.
-          The King Wen sequence traces a specific path through it. Anchored to the Unix epoch
-          (the foundational timestamp of all digital systems), that path maps onto calendar time,
-          assigning 6 days to each of the 64 transitions for a 384-day cycle. This display shows
+          The King Wen sequence traces a specific path through it. This display shows
           where that cycle stands today, as an aid to sensing the current moment and crafting an
           enquiry resonant with it.
         </p>
