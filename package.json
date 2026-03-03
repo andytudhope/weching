@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "rm -rf .tmp-tests && npx tsc -p tsconfig.json --outDir .tmp-tests --module commonjs --moduleResolution node --target es2020 --noEmit false --declaration false && node --test tests/*.test.cjs"
+    "test": "rm -rf .tmp-tests && npx tsc -p tsconfig.test.json && node --test tests/*.test.cjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
