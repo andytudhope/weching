@@ -67,10 +67,9 @@ export function exportThread(readings: TemporalReading[]): string {
       const toInfo = getHexagramInfo(to.lines);
       return [
         `**Reading ${t.fromIndex + 1} → Reading ${t.toIndex + 1}**`,
-        `Hexagram ${fromInfo.number} → ${toInfo.number}`,
         `Operator: ${t.operator.map((b) => (b ? "1" : "0")).join("")}`,
         `Weight: ${t.hammingWeight} (${t.operatorClass}, ${t.trigramCharacter} trigram)`,
-        describeTransition(t, readings),
+        ...describeTransition(t, readings).split("\n"),
       ].join("  \n");
     })
     .join("\n\n");

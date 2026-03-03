@@ -5,14 +5,14 @@ import { getTemporalTexture } from "@/lib/kingwen";
 import { hexagramNumberToLines, getHexagramInfo } from "@/lib/hexagrams";
 
 const TRIGRAMS = [
-  { symbol: "☷", name: "K'un" },
-  { symbol: "☳", name: "Chên" },
-  { symbol: "☵", name: "K'an" },
-  { symbol: "☱", name: "Tui" },
-  { symbol: "☶", name: "Kên" },
-  { symbol: "☲", name: "Li" },
-  { symbol: "☴", name: "Sun" },
-  { symbol: "☰", name: "Ch'ien" },
+  { symbol: "☷", name: "K'un",   element: "Earth" },
+  { symbol: "☳", name: "Chên",   element: "Thunder" },
+  { symbol: "☵", name: "K'an",   element: "Water" },
+  { symbol: "☱", name: "Tui",    element: "Lake" },
+  { symbol: "☶", name: "Kên",    element: "Mountain" },
+  { symbol: "☲", name: "Li",     element: "Fire" },
+  { symbol: "☴", name: "Sun",    element: "Wind" },
+  { symbol: "☰", name: "Ch'ien", element: "Heaven" },
 ];
 
 function trigramBits(lines: boolean[], offset: number): number {
@@ -86,6 +86,7 @@ export function TrigramGrid({ today }: Props) {
               >
                 <span className="text-base leading-none text-foreground/60">{t.symbol}</span>
                 <span className="text-[7px] font-serif text-muted-foreground mt-0.5">{t.name}</span>
+                <span className="text-[6px] font-serif text-muted-foreground/60 mt-0.5">{t.element}</span>
               </div>
             ))}
           </div>
@@ -99,9 +100,10 @@ export function TrigramGrid({ today }: Props) {
                   className="flex items-center justify-end gap-1 pr-2"
                   style={{ height: CELL }}
                 >
-                  <span className="text-[7px] font-serif text-muted-foreground leading-none text-right">
-                    {t.name}
-                  </span>
+                  <div className="flex flex-col items-end">
+                    <span className="text-[7px] font-serif text-muted-foreground leading-none">{t.name}</span>
+                    <span className="text-[6px] font-serif text-muted-foreground/60 leading-none mt-0.5">{t.element}</span>
+                  </div>
                   <span className="text-base leading-none text-foreground/60">{t.symbol}</span>
                 </div>
               ))}

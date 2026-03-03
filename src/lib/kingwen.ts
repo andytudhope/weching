@@ -1,4 +1,4 @@
-import { hexagramNumberToLines } from "./hexagrams";
+import { hexagramNumberToLines, getTrigramPair } from "./hexagrams";
 import { xorHexagrams, hammingWeight, trigramCharacter, operatorClass } from "./operators";
 import type { TemporalTexture } from "@/types/thread";
 
@@ -149,41 +149,61 @@ export function describeNeighbourhood(neighbourhood: TemporalTexture[]): string 
   const todayClass = today.operatorClass;
   const todayFod = today.fodValue;
 
+  // Active pair trigrams
+  const fromNum = KING_WEN_SEQUENCE[today.hexagramPairIndex];
+  const toNum = KING_WEN_SEQUENCE[(today.hexagramPairIndex + 1) % 64];
+  const fromLines = hexagramNumberToLines(fromNum);
+  const toLines = hexagramNumberToLines(toNum);
+  const { lower: fromLower, upper: fromUpper } = getTrigramPair(fromLines);
+  const { lower: toLower, upper: toUpper } = getTrigramPair(toLines);
+
   // Find any nearby class shifts (within ±5 days)
   const centre = Math.floor(neighbourhood.length / 2);
   const upcoming = neighbourhood.slice(centre + 1, centre + 6);
   const different = upcoming.find((t) => t.operatorClass !== todayClass);
 
-  const classDescriptions: Record<string, string> = {
-    identity: "perfect stillness — the same hexagram persists",
-    surgical: "precise, singular shifts — a time for discernment and exact adjustments",
-    moderate: "steady, moderate movement — gradual adjustment rather than rupture",
-    substantial: "substantial transformation — much is in motion",
-    total: "total inversion — complete reversal of the present configuration",
-  };
+  const tc = today.trigramCharacter;
 
-  const trigramDescriptions: Record<string, string> = {
-    lower: "inner",
-    upper: "outer",
-    both: "inner and outer",
-    none: "",
-  };
-
-  const trigramNote =
-    today.trigramCharacter !== "none"
-      ? ` affecting the ${trigramDescriptions[today.trigramCharacter]} world`
-      : "";
-
-  let desc = `The quality of these days is ${classDescriptions[todayClass]}${trigramNote}`;
-  if (todayFod === 1 || todayFod === 2) {
-    desc += ` — ${fodNoteForWeight(todayFod).split(":")[0].toLowerCase()}`;
+  // Describe what shifts elementally
+  let transitionDesc: string;
+  if (todayClass === "identity") {
+    transitionDesc = `${fromLower.element} within, ${fromUpper.element} above — the configuration holds, no movement.`;
+  } else if (todayClass === "total") {
+    transitionDesc = `${fromLower.element} within, ${fromUpper.element} above — all six lines invert: ${toLower.element} within, ${toUpper.element} above.`;
+  } else if (tc === "lower") {
+    transitionDesc = `${fromLower.element} shifts within to ${toLower.element}; ${fromUpper.element} holds above.`;
+  } else if (tc === "upper") {
+    transitionDesc = `${fromLower.element} holds within; ${fromUpper.element} shifts above to ${toUpper.element}.`;
+  } else {
+    // both
+    transitionDesc = `${fromLower.element} within shifts to ${toLower.element}; ${fromUpper.element} above shifts to ${toUpper.element}.`;
   }
-  desc += ".";
+
+  // Quality sentence
+  const qualityDesc: Record<string, string> = {
+    identity: "",
+    surgical: "A single line moves — precise, discerning.",
+    moderate: `${todayFod} lines shift — gradual, steady movement.`,
+    substantial: `${todayFod} lines shift — substantial transformation, much in motion.`,
+    total: "",
+  };
+
+  let desc = transitionDesc;
+  if (qualityDesc[todayClass]) {
+    desc += ` ${qualityDesc[todayClass]}`;
+  }
 
   if (different) {
     const daysAway = upcoming.indexOf(different) + 1;
     const dayWord = daysAway === 1 ? "Tomorrow" : `In ${daysAway} days`;
-    desc += ` ${dayWord} the quality shifts toward ${classDescriptions[different.operatorClass]}.`;
+    const shiftClassNames: Record<string, string> = {
+      identity: "stillness",
+      surgical: "precise, singular movement",
+      moderate: "steady rhythm",
+      substantial: "substantial transformation",
+      total: "complete inversion",
+    };
+    desc += ` ${dayWord} the quality shifts toward ${shiftClassNames[different.operatorClass]}.`;
   }
 
   return desc;

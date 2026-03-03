@@ -1,4 +1,4 @@
-import { getHexagramInfo } from "./hexagrams";
+import { getHexagramInfo, getTrigramPair } from "./hexagrams";
 import type {
   TemporalReading,
   ReadingTransition,
@@ -100,21 +100,19 @@ export function describeTransition(t: ReadingTransition, readings: TemporalReadi
     total: "All six lines invert — complete reversal, the complement hexagram.",
   };
 
+  const { lower, upper } = getTrigramPair(from.lines);
   const trigramDesc: Record<string, string> = {
-    lower: "The lower trigram (inner world) transforms.",
-    upper: "The upper trigram (outer world) transforms.",
-    both: "Both trigrams transform.",
+    lower: `${lower.element} moves within — the inner world shifts.`,
+    upper: `${upper.element} moves above — the outer situation shifts.`,
+    both: `${lower.element} within, ${upper.element} above — both worlds are in motion.`,
     none: "",
   };
 
-  const parts = [
-    `Hexagram ${fromInfo.number} → ${toInfo.number}`,
-    classDesc[t.operatorClass],
-  ];
+  const body = [classDesc[t.operatorClass]];
   if (t.trigramCharacter !== "none") {
-    parts.push(trigramDesc[t.trigramCharacter]);
+    body.push(trigramDesc[t.trigramCharacter]);
   }
-  return parts.join(" ");
+  return `Hexagram ${fromInfo.number} → ${toInfo.number}\n${body.join(" ")}`;
 }
 
 export function analyzeThread(readings: TemporalReading[]): ThreadAnalysis {

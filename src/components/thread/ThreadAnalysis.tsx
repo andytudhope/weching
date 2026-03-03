@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { HexagramDisplay } from "@/components/HexagramDisplay";
 import { analyzeThread, describeTransition, changedLinePositions, LINE_POSITION_MEANINGS } from "@/lib/operators";
 import { fodRarityNote, fodNoteForWeight } from "@/lib/kingwen";
-import { getHexagramInfo } from "@/lib/hexagrams";
+import { getHexagramInfo, getTrigramPair } from "@/lib/hexagrams";
 import type { ReadingTransition, TemporalReading } from "@/types/thread";
 
 // ——— Inquiry reflection prompts ———
@@ -66,6 +66,8 @@ function OperatorCard({ transition, readings, fromIndex, toIndex }: OperatorCard
   const toInfo = getHexagramInfo(toReading.lines);
   const changedLines = changedLinePositions(transition.operator);
   const w = transition.hammingWeight;
+  const trigramPair = getTrigramPair(fromReading.lines);
+  const toTrigramPair = getTrigramPair(toReading.lines);
   const prompt = inquiryPrompt(w, changedLines, fromInfo.name, toInfo.name);
   // Use the destination reading's inquiry as the primary reference —
   // that's the question the person was holding when they arrived at the new hexagram.
@@ -89,7 +91,7 @@ function OperatorCard({ transition, readings, fromIndex, toIndex }: OperatorCard
       </p>
 
       {/* Main description */}
-      <p className="font-serif text-sm text-foreground/80">
+      <p className="font-serif text-sm text-foreground/80 whitespace-pre-line">
         {describeTransition(transition, readings)}
       </p>
 
@@ -106,11 +108,25 @@ function OperatorCard({ transition, readings, fromIndex, toIndex }: OperatorCard
             <p className="font-serif text-xs text-muted-foreground uppercase tracking-wide">
               {w === 1 ? "the line that moves" : "lines that move"}
             </p>
-            {changedLines.map((lineNum) => (
-              <p key={lineNum} className="font-serif text-xs text-foreground/70 leading-relaxed">
-                {LINE_POSITION_MEANINGS[lineNum]}
-              </p>
-            ))}
+            {changedLines.map((lineNum) => {
+              const isLower = lineNum <= 3;
+              const fromTrigram = isLower ? trigramPair.lower : trigramPair.upper;
+              const toTrigram = isLower ? toTrigramPair.lower : toTrigramPair.upper;
+              const worldLabel = isLower ? "inner" : "outer";
+              return (
+                <div key={lineNum} className="space-y-0.5">
+                  <p className="font-serif text-xs text-foreground/70 leading-relaxed">
+                    {LINE_POSITION_MEANINGS[lineNum]}
+                  </p>
+                  <div className="flex items-center gap-1.5 font-serif text-xs text-muted-foreground">
+                    <span>{worldLabel}:</span>
+                    <span>{fromTrigram.symbol} {fromTrigram.element}</span>
+                    <span className="leading-none">→</span>
+                    <span>{toTrigram.symbol} {toTrigram.element}</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
 

@@ -9,7 +9,7 @@ import {
   KING_WEN_FOD,
   getFodDistributionSummary,
 } from "@/lib/kingwen";
-import { hexagramNumberToLines, getHexagramInfo } from "@/lib/hexagrams";
+import { hexagramNumberToLines, getHexagramInfo, getTrigramPair } from "@/lib/hexagrams";
 import { xorHexagrams, trigramCharacter } from "@/lib/operators";
 import { TrigramGrid } from "@/components/TrigramGrid";
 
@@ -183,13 +183,15 @@ export function NeighbourhoodDisplay({ today }: NeighbourhoodDisplayProps) {
   const operator = useMemo(() => xorHexagrams(fromLines, toLines), [fromLines, toLines]);
   const fromInfo = useMemo(() => getHexagramInfo(fromLines), [fromLines]);
   const toInfo = useMemo(() => getHexagramInfo(toLines), [toLines]);
+  const fromTrigrams = useMemo(() => getTrigramPair(fromLines), [fromLines]);
+  const toTrigrams = useMemo(() => getTrigramPair(toLines), [toLines]);
 
   const fod = texture.fodValue;
 
   const trigramDesc: Record<string, string> = {
-    lower: "inner world (lower trigram)",
-    upper: "outer world (upper trigram)",
-    both: "inner and outer worlds",
+    lower: `${fromTrigrams.lower.element} (inner)`,
+    upper: `${fromTrigrams.upper.element} (outer)`,
+    both: `${fromTrigrams.lower.element} and ${fromTrigrams.upper.element}`,
     none: "neither trigram directly",
   };
 
@@ -239,6 +241,12 @@ export function NeighbourhoodDisplay({ today }: NeighbourhoodDisplayProps) {
               <div className="flex flex-col items-center gap-1">
                 <MiniHex lines={fromLines} />
                 <p className="text-[10px] font-mono text-primary">{fromNum}</p>
+                <p className="text-[9px] font-serif text-muted-foreground leading-none">
+                  {fromTrigrams.lower.symbol} {fromTrigrams.lower.element}
+                </p>
+                <p className="text-[9px] font-serif text-muted-foreground leading-none">
+                  {fromTrigrams.upper.symbol} {fromTrigrams.upper.element}
+                </p>
               </div>
 
               {/* Operator dots */}
@@ -251,6 +259,12 @@ export function NeighbourhoodDisplay({ today }: NeighbourhoodDisplayProps) {
               <div className="flex flex-col items-center gap-1">
                 <MiniHex lines={toLines} />
                 <p className="text-[10px] font-mono text-primary">{toNum}</p>
+                <p className="text-[9px] font-serif text-muted-foreground leading-none">
+                  {toTrigrams.lower.symbol} {toTrigrams.lower.element}
+                </p>
+                <p className="text-[9px] font-serif text-muted-foreground leading-none">
+                  {toTrigrams.upper.symbol} {toTrigrams.upper.element}
+                </p>
               </div>
             </div>
 

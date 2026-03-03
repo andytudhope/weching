@@ -100,6 +100,52 @@ function trigramBits(lines: boolean[]): number {
   );
 }
 
+export interface TrigramData {
+  symbol: string;   // e.g. "☰"
+  name: string;     // e.g. "Ch'ien"
+  element: string;  // e.g. "Heaven"
+  quality: string;  // e.g. "creative"
+  inner: string;    // natural phrase when this trigram is lower (inner world)
+  outer: string;    // natural phrase when this trigram is upper (outer world)
+}
+
+export const TRIGRAM_DATA: Record<number, TrigramData> = {
+  7: { symbol: "☰", name: "Ch'ien", element: "Heaven",   quality: "creative",
+       inner: "Heaven arises within — the creative impulse stirs",
+       outer: "Heaven moves above — creative force descends" },
+  0: { symbol: "☷", name: "K'un",   element: "Earth",    quality: "receptive",
+       inner: "Earth holds within — patient, yielding, still",
+       outer: "Earth receives above — the field is open" },
+  1: { symbol: "☳", name: "Chên",   element: "Thunder",  quality: "arousing",
+       inner: "Thunder stirs within — sudden awakening",
+       outer: "Thunder moves above — arousal comes from outside" },
+  2: { symbol: "☵", name: "K'an",   element: "Water",    quality: "abysmal",
+       inner: "Water flows within — deep current, inner danger",
+       outer: "Water moves above — the depths are outside" },
+  4: { symbol: "☶", name: "Kên",    element: "Mountain", quality: "still",
+       inner: "Mountain rests within — inner stillness, holding",
+       outer: "Mountain stands above — the outer world is still" },
+  6: { symbol: "☴", name: "Sun",    element: "Wind",     quality: "gentle",
+       inner: "Wind moves within — gentle inner penetration",
+       outer: "Wind passes above — subtle influence from outside" },
+  5: { symbol: "☲", name: "Li",     element: "Fire",     quality: "clinging",
+       inner: "Fire burns within — inner clarity and brightness",
+       outer: "Fire illuminates above — clarity comes from without" },
+  3: { symbol: "☱", name: "Tui",    element: "Lake",     quality: "joyful",
+       inner: "Lake gathers within — inner joy, reflection",
+       outer: "Lake opens above — joy and openness in the outer world" },
+};
+
+// Returns the lower and upper TrigramData for any 6-line hexagram
+export function getTrigramPair(lines: boolean[]): { lower: TrigramData; upper: TrigramData } {
+  const lowerBits = trigramBits(lines.slice(0, 3));
+  const upperBits = trigramBits(lines.slice(3, 6));
+  return {
+    lower: TRIGRAM_DATA[lowerBits],
+    upper: TRIGRAM_DATA[upperBits],
+  };
+}
+
 export interface HexagramInfo {
   number: number;
   name: string;
