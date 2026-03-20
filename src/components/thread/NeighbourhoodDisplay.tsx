@@ -213,7 +213,7 @@ export function NeighbourhoodDisplay({ today }: NeighbourhoodDisplayProps) {
         <p className="text-xs font-serif text-muted-foreground mt-1">
           The I Ching&apos;s 64 hexagrams form a 6-dimensional hypercube — a space of possible states.
           The King Wen sequence traces a specific path through it. This display shows
-          where that cycle stands today, as an aid to sensing the current moment and crafting an
+          where that cycle stands today, in digital time, as an aid to sensing the current moment and crafting an
           enquiry resonant with it.
         </p>
       </div>

@@ -14,6 +14,8 @@ export interface CircleParticipant {
 export interface Circle {
   id: string;
   createdAt: number;
+  method: "seeds" | "timing";  // casting method chosen at creation
+  parentIds: string[];         // circles this was seeded from (empty if root)
   inquiry?: string;            // distilled group inquiry question
   fragments: InquiryFragment[];
   participants: CircleParticipant[];

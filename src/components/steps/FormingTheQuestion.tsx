@@ -34,14 +34,14 @@ export function FormingTheQuestion({
         <div className="space-y-4">
           <h3 className="text-lg font-serif font-medium text-primary flex items-center">
             <MessageCircle className="w-4 h-4 mr-2" />
-            Group Process
+            The Process
           </h3>
           <p className="text-foreground/80 font-serif">
-            Each participant should first handwrite their individual inquiry in
-            their journal. Then share and discuss to form a collective question.
+            Handwrite your individual inquiry in a journal, whether starting an indivual thread, or a group circle. 
+            If creating a circle, share and discuss to form a collective question.
           </p>
           <p className="text-foreground/80 font-serif">
-            The process is intentionally messy and non-linear — conversation and
+            The group process is intentionally messy and non-linear — conversation and
             synthesis are key. This app will keep your fragments, reflections, thoughts 
             and questions safe untul you have reached a good enough question that the whole 
             group is happy to put to the I Ching.

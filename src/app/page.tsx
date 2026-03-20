@@ -7,11 +7,9 @@ import { StepTransition } from "@/components/StepTransition";
 import { Preparation } from "@/components/steps/Preparation";
 import { FormingTheQuestion } from "@/components/steps/FormingTheQuestion";
 import { SeedMethod } from "@/components/steps/SeedMethod";
-import { CountingProcess } from "@/components/steps/CountingProcess";
+type View = "landing" | "intro" | "choice" | "circle-method";
 
-type View = "landing" | "intro" | "choice";
-
-const INTRO_STEPS = 4;
+const INTRO_STEPS = 3;
 
 export default function Home() {
   const router = useRouter();
@@ -19,10 +17,14 @@ export default function Home() {
   const [introStep, setIntroStep] = useState(0);
   const [creating, setCreating] = useState(false);
 
-  async function startCircle() {
+  async function startCircle(method: "seeds" | "timing") {
     setCreating(true);
     try {
-      const res = await fetch("/api/circle", { method: "POST" });
+      const res = await fetch("/api/circle", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ method }),
+      });
       const { id } = await res.json();
       router.push(`/circle/${id}`);
     } finally {
@@ -107,7 +109,6 @@ export default function Home() {
         case 0: return <Preparation onContinue={nextIntroStep} onBack={prevIntroStep} onSkip={skipToChoice} />;
         case 1: return <FormingTheQuestion onContinue={nextIntroStep} onBack={prevIntroStep} onSkip={skipToChoice} />;
         case 2: return <SeedMethod onContinue={nextIntroStep} onBack={prevIntroStep} onSkip={skipToChoice} />;
-        case 3: return <CountingProcess onContinue={nextIntroStep} onBack={prevIntroStep} onSkip={skipToChoice} />;
         default: return null;
       }
     };
@@ -117,6 +118,56 @@ export default function Home() {
         <ProgressBar currentStep={introStep + 1} totalSteps={INTRO_STEPS + 1} />
         <StepTransition stepKey={introStep}>{renderIntroStep()}</StepTransition>
         <div className="py-8 border-t border-border">
+          <p className="text-center text-xs text-muted-foreground font-serif">
+            Licensed under GNU AGPL v3.0
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // ── CIRCLE METHOD PICKER ──
+  if (view === "circle-method") {
+    return (
+      <div className="min-h-screen bg-gradient-warm flex flex-col">
+        <div className="flex-1 flex flex-col items-center justify-center text-center px-6 space-y-10">
+          <div className="space-y-4 font-serif text-foreground/80 leading-relaxed max-w-sm">
+            <h2 className="text-lg font-serif text-primary font-medium">
+              choose a casting method
+            </h2>
+            <p className="text-sm">
+              Everyone in this circle will use the same method. Choose one before sharing the link.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-4 w-full max-w-xs">
+            <button
+              onClick={() => startCircle("timing")}
+              disabled={creating}
+              className="px-8 py-4 rounded-xl bg-primary text-primary-foreground font-serif text-base shadow-warm hover:shadow-meditation transition-all duration-300 disabled:opacity-60 space-y-1"
+            >
+              <div>{creating ? "creating…" : "timing"}</div>
+              <div className="text-xs opacity-70">hold a screen to cast each line</div>
+            </button>
+            <button
+              onClick={() => startCircle("seeds")}
+              disabled={creating}
+              className="px-8 py-4 rounded-xl border border-primary text-primary font-serif text-base hover:bg-primary/5 transition-all duration-300 disabled:opacity-60 space-y-1"
+            >
+              <div>{creating ? "creating…" : "seeds"}</div>
+              <div className="text-xs opacity-70">count seed piles for each line</div>
+            </button>
+          </div>
+
+          <button
+            onClick={() => setView("choice")}
+            className="font-serif text-sm text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4 decoration-muted-foreground/30"
+          >
+            ← back
+          </button>
+        </div>
+
+        <div className="py-6 border-t border-border">
           <p className="text-center text-xs text-muted-foreground font-serif">
             Licensed under GNU AGPL v3.0
           </p>
@@ -135,11 +186,10 @@ export default function Home() {
               The first kind of co-inquiry involves a collective of many different people at the same time.
             </p>
             <button
-              onClick={startCircle}
-              disabled={creating}
-              className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-serif text-base shadow-warm hover:shadow-meditation transition-all duration-300 disabled:opacity-60"
+              onClick={() => setView("circle-method")}
+              className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-serif text-base shadow-warm hover:shadow-meditation transition-all duration-300"
             >
-              {creating ? "creating…" : "Start a circle"}
+              Start a circle
             </button>
           </div>
 

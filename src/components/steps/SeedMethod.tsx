@@ -12,11 +12,16 @@ export function SeedMethod({ onContinue, onBack, onSkip }: SeedMethodProps) {
     <StepLayout onContinue={onContinue} onBack={onBack} onSkip={onSkip}>
       <h2 className="text-2xl font-serif tracking-wide text-primary flex items-center justify-center">
         <Hand className="w-6 h-6 mr-3" />
-        The Method
+        Two Methods
       </h2>
 
       <div className="space-y-6">
         <div className="space-y-4">
+          <p className="text-foreground/80 font-serif">
+            We present two methods for casting the I Ching: the traditional seed method, and a digital method. 
+            The creator of a circle sets the method for that circle, so everyone in the circle will use the same method. 
+            If casting an individual thread, you can choose for which method resonates most in the moment.
+          </p>
           <h3 className="text-lg font-serif font-medium text-primary">
             Pinch Technique
           </h3>
@@ -34,9 +39,9 @@ export function SeedMethod({ onContinue, onBack, onSkip }: SeedMethodProps) {
         </div>
 
         <div className="space-y-4">
-          <h3 className="text-lg font-serif font-medium text-primary">
+          <h4 className="text-md font-serif font-medium text-primary">
             Hexagram Formation
-          </h3>
+          </h4>
           <p className="text-foreground/80 font-serif">
             Form 6 piles of seeds in a column. Each pile creates a line based on
             odd or even count:
@@ -58,9 +63,9 @@ export function SeedMethod({ onContinue, onBack, onSkip }: SeedMethodProps) {
         </div>
 
         <div className="space-y-4">
-          <h3 className="text-lg font-serif font-medium text-primary">
+          <h4 className="text-md font-serif font-medium text-primary">
             Changing Line
-          </h3>
+          </h4>
           <p className="text-foreground/80 font-serif">
             Form a 7th pile to the right of your column. This determines the
             changing line:

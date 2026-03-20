@@ -5,6 +5,8 @@ import type { InquiryFragment, CircleParticipant } from "@/types/circle";
 interface CircleRow {
   id: string;
   created_at: number;
+  method: string;
+  parent_ids: string;
   inquiry: string | null;
   fragments: string;
   participants: string;
@@ -21,7 +23,7 @@ export async function GET(
 ) {
   const { id } = await params;
   const row = db
-    .prepare("SELECT id, created_at, inquiry, fragments, participants FROM circles WHERE id = ?")
+    .prepare("SELECT id, created_at, method, parent_ids, inquiry, fragments, participants FROM circles WHERE id = ?")
     .get(id) as CircleRow | undefined;
 
   if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -29,6 +31,8 @@ export async function GET(
   return NextResponse.json({
     id: row.id,
     createdAt: row.created_at,
+    method: (row.method === "seeds" ? "seeds" : "timing") as "seeds" | "timing",
+    parentIds: JSON.parse(row.parent_ids ?? "[]") as string[],
     inquiry: row.inquiry ?? undefined,
     fragments: JSON.parse(row.fragments) as InquiryFragment[],
     participants: JSON.parse(row.participants) as CircleParticipant[],

@@ -38,10 +38,21 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS circles (
     id           TEXT    PRIMARY KEY,
     created_at   INTEGER NOT NULL,
+    method       TEXT    NOT NULL DEFAULT 'timing',
+    parent_ids   TEXT    NOT NULL DEFAULT '[]',
     inquiry      TEXT,
     fragments    TEXT    NOT NULL DEFAULT '[]',
     participants TEXT    NOT NULL DEFAULT '[]'
   );
 `);
+
+// Migrations: add columns added after initial schema
+const cols = db.pragma("table_info(circles)") as { name: string }[];
+if (!cols.some((c) => c.name === "method")) {
+  db.exec("ALTER TABLE circles ADD COLUMN method TEXT NOT NULL DEFAULT 'timing'");
+}
+if (!cols.some((c) => c.name === "parent_ids")) {
+  db.exec("ALTER TABLE circles ADD COLUMN parent_ids TEXT NOT NULL DEFAULT '[]'");
+}
 
 export default db;

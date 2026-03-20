@@ -59,6 +59,62 @@ export default function CirclePage({ params }: { params: Promise<{ id: string }>
   // Copy link state
   const [copied, setCopied] = useState(false);
 
+  // Carry forward
+  const [carryOpen, setCarryOpen] = useState(false);
+  const [carryMethod, setCarryMethod] = useState<"timing" | "seeds">("timing");
+  const [carrying, setCarrying] = useState(false);
+
+  async function handleCarryForward() {
+    if (!circle?.inquiry || carrying) return;
+    setCarrying(true);
+    try {
+      const res = await fetch("/api/circle", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          method: carryMethod,
+          parentIds: [id],
+          // The distilled inquiry becomes an anonymous seed in the child circle
+          fragments: [{ text: circle.inquiry, addedAt: Date.now() }],
+        }),
+      });
+      const { id: newId } = await res.json();
+      window.location.href = `/circle/${newId}`;
+    } finally {
+      setCarrying(false);
+    }
+  }
+
+  // Parent circles — fetched when this circle has parentIds
+  const [parentCircles, setParentCircles] = useState<
+    { fragments: { text: string; addedAt: number }[] }[]
+  >([]);
+
+  useEffect(() => {
+    if (!circle || circle.parentIds.length === 0) {
+      setParentCircles([]);
+      return;
+    }
+    Promise.all(
+      circle.parentIds.map((pid) =>
+        fetch(`/api/circle/${pid}`)
+          .then((r) => (r.ok ? r.json() : null))
+          .catch(() => null)
+      )
+    ).then((results) => {
+      setParentCircles(
+        results
+          .filter(Boolean)
+          .map((c) => ({
+            // Strip author names — anonymous seeds only
+            fragments: (c.fragments as { text: string; addedAt: number; author?: string }[]).map(
+              ({ text, addedAt }) => ({ text, addedAt })
+            ),
+          }))
+      );
+    });
+  }, [circle?.parentIds.join(",")]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Results explainer
   const [explainerOpen, setExplainerOpen] = useState(false);
 
@@ -73,6 +129,7 @@ export default function CirclePage({ params }: { params: Promise<{ id: string }>
       }
       const data = await res.json();
       setCircle(data);
+      setCastMode(data.method === "seeds" ? "seeds" : "timing");
     } catch {
       // silent poll failure
     }
@@ -279,34 +336,60 @@ export default function CirclePage({ params }: { params: Promise<{ id: string }>
           </div>
 
           {/* Fragment list */}
-          <div className="space-y-2">
+          <div className="space-y-4">
             <p className="text-xs font-serif text-muted-foreground uppercase tracking-widest text-center">
               the collection
             </p>
             {circle.fragments.length === 0 && (
               <p className="text-sm font-serif text-muted-foreground text-center italic py-4">
-                No thoughts yet — add the first.
+                No seeds yet — offer the first.
               </p>
             )}
             {circle.fragments.map((f, i) => (
               <div
                 key={i}
-                className="p-3 rounded-xl bg-gradient-subtle border border-border shadow-soft space-y-1"
+                className="px-4 py-4 rounded-xl bg-gradient-subtle border border-border shadow-soft space-y-2"
               >
                 <p className="text-sm font-serif text-foreground leading-relaxed">{f.text}</p>
-                <p className="text-xs font-serif text-muted-foreground">
-                  {f.author ?? "anonymous"} · {relativeTime(f.addedAt)}
+                <p className="text-[11px] font-serif text-muted-foreground/60">
+                  {f.author ? f.author : "anonymous"}
                 </p>
               </div>
             ))}
           </div>
+
+          {/* Seeds from parent circles */}
+          {parentCircles.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-xs font-serif text-muted-foreground uppercase tracking-widest text-center">
+                inherited seeds
+              </p>
+              {parentCircles.map((pc, i) => (
+                <details key={i} className="rounded-xl border border-border/50 bg-gradient-subtle shadow-soft">
+                  <summary className="px-4 py-3 text-xs font-serif text-muted-foreground uppercase tracking-widest cursor-pointer">
+                    {parentCircles.length === 1 ? "a prior circle" : `prior circle ${i + 1}`}
+                    {pc.fragments.length > 0 ? ` (${pc.fragments.length})` : ""}
+                  </summary>
+                  <div className="px-4 pb-4 space-y-4 pt-2">
+                    {pc.fragments.length === 0 ? (
+                      <p className="text-xs font-serif text-muted-foreground italic">no seeds recorded</p>
+                    ) : (
+                      pc.fragments.map((f, j) => (
+                        <p key={j} className="text-sm font-serif text-foreground/70 leading-relaxed">{f.text}</p>
+                      ))
+                    )}
+                  </div>
+                </details>
+              ))}
+            </div>
+          )}
 
           {/* Add fragment */}
           <div className="space-y-2 pt-2 border-t border-border/40">
             <textarea
               value={fragmentText}
               onChange={(e) => setFragmentText(e.target.value)}
-              placeholder="your thought, question, poem, fragment, wandering..."
+              placeholder="a wondering, an image, a fragment of the question…"
               rows={3}
               className="w-full px-3 py-2 rounded-lg border border-border bg-background font-serif text-sm resize-none focus:outline-none focus:ring-1 focus:ring-primary"
             />
@@ -355,33 +438,59 @@ export default function CirclePage({ params }: { params: Promise<{ id: string }>
         <div className="max-w-lg mx-auto w-full px-4 py-8 space-y-6">
           <NavTabs />
 
-          {/* The collection — read-only */}
+          {/* The seeds — read-only, open to inform distillation */}
           {circle.fragments.length > 0 && (
-            <details className="rounded-xl border border-border bg-gradient-subtle shadow-soft" open>
-              <summary className="px-4 py-3 text-xs font-serif text-muted-foreground uppercase tracking-widest cursor-pointer">
-                the collection ({circle.fragments.length} fragment{circle.fragments.length !== 1 ? "s" : ""})
-              </summary>
-              <div className="px-4 pb-4 space-y-3">
-                {circle.fragments.map((f, i) => (
-                  <div key={i} className="space-y-0.5">
-                    <p className="text-sm font-serif text-foreground leading-relaxed">{f.text}</p>
-                    <p className="text-xs font-serif text-muted-foreground">
-                      — {f.author ?? "anonymous"}
-                    </p>
+            <div className="space-y-4">
+              <p className="text-xs font-serif text-muted-foreground uppercase tracking-widest text-center">
+                the seeds
+              </p>
+              {circle.fragments.map((f, i) => (
+                <div key={i} className="px-4 py-4 rounded-xl bg-gradient-subtle border border-border shadow-soft space-y-2">
+                  <p className="text-sm font-serif text-foreground leading-relaxed">{f.text}</p>
+                  <p className="text-[11px] font-serif text-muted-foreground/60">
+                    {f.author ? f.author : "anonymous"}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Seeds from parent circles */}
+          {parentCircles.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-xs font-serif text-muted-foreground uppercase tracking-widest text-center">
+                inherited seeds
+              </p>
+              {parentCircles.map((pc, i) => (
+                <details key={i} className="rounded-xl border border-border/50 bg-gradient-subtle shadow-soft">
+                  <summary className="px-4 py-3 text-xs font-serif text-muted-foreground uppercase tracking-widest cursor-pointer">
+                    {parentCircles.length === 1 ? "a prior circle" : `prior circle ${i + 1}`}
+                    {pc.fragments.length > 0 ? ` (${pc.fragments.length})` : ""}
+                  </summary>
+                  <div className="px-4 pb-4 space-y-4 pt-2">
+                    {pc.fragments.length === 0 ? (
+                      <p className="text-xs font-serif text-muted-foreground italic">no seeds recorded</p>
+                    ) : (
+                      pc.fragments.map((f, j) => (
+                        <p key={j} className="text-sm font-serif text-foreground/70 leading-relaxed">{f.text}</p>
+                      ))
+                    )}
                   </div>
-                ))}
-              </div>
-            </details>
+                </details>
+              ))}
+            </div>
           )}
 
           {/* Distil the inquiry */}
           <div className="space-y-3">
-            <div className="space-y-1">
+            <div className="space-y-2">
               <p className="text-xs font-serif text-muted-foreground uppercase tracking-widest text-center">
                 the inquiry
               </p>
-              <p className="text-sm font-serif text-foreground/70 text-center leading-relaxed">
-                From all that has been collected, what is the one clear question you bring to the I Ching?
+              <p className="text-sm font-serif text-foreground/60 text-center leading-relaxed italic">
+                {circle.fragments.length > 0 || parentCircles.length > 0
+                  ? "from these seeds, what is the shared question?"
+                  : "what is the question this circle brings to the oracle?"}
               </p>
             </div>
 
@@ -450,14 +559,14 @@ export default function CirclePage({ params }: { params: Promise<{ id: string }>
           {circle.fragments.length > 0 && (
             <details className="rounded-xl border border-border bg-gradient-subtle shadow-soft">
               <summary className="px-4 py-3 text-xs font-serif text-muted-foreground uppercase tracking-widest cursor-pointer">
-                the collection ({circle.fragments.length} fragment{circle.fragments.length !== 1 ? "s" : ""})
+                the seeds ({circle.fragments.length})
               </summary>
-              <div className="px-4 pb-4 space-y-2">
+              <div className="px-4 pb-4 space-y-4 pt-2">
                 {circle.fragments.map((f, i) => (
-                  <div key={i} className="space-y-0.5">
+                  <div key={i} className="space-y-1.5">
                     <p className="text-sm font-serif text-foreground leading-relaxed">{f.text}</p>
-                    <p className="text-xs font-serif text-muted-foreground">
-                      — {f.author ?? "anonymous"}
+                    <p className="text-[11px] font-serif text-muted-foreground/60">
+                      {f.author ? f.author : "anonymous"}
                     </p>
                   </div>
                 ))}
@@ -482,33 +591,14 @@ export default function CirclePage({ params }: { params: Promise<{ id: string }>
                   />
                 </div>
 
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setCastMode("timing")}
-                    className={`flex-1 py-2 rounded-lg font-serif text-sm border transition-colors ${
-                      castMode === "timing"
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "border-border text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    timing
-                  </button>
-                  <button
-                    onClick={() => setCastMode("seeds")}
-                    className={`flex-1 py-2 rounded-lg font-serif text-sm border transition-colors ${
-                      castMode === "seeds"
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "border-border text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    seeds
-                  </button>
-                </div>
+                <p className="text-xs font-serif text-muted-foreground text-center uppercase tracking-widest">
+                  method: {castMode}
+                </p>
 
                 {castMode === "timing" && (
                   <DigitalCasting
                     onComplete={handleTimingComplete}
-                    onCancel={() => setCastMode("seeds")}
+                    onCancel={() => {}}
                   />
                 )}
 
@@ -653,11 +743,67 @@ export default function CirclePage({ params }: { params: Promise<{ id: string }>
 
         {/* Inquiry question */}
         {circle.inquiry && (
-          <div className="p-4 rounded-xl bg-gradient-subtle border border-primary/20 shadow-soft text-center">
-            <p className="text-xs font-serif text-muted-foreground uppercase tracking-widest mb-2">the inquiry</p>
-            <p className="text-sm font-serif text-primary font-medium leading-relaxed italic">
-              &ldquo;{circle.inquiry}&rdquo;
-            </p>
+          <div className="space-y-3">
+            <div className="p-4 rounded-xl bg-gradient-subtle border border-primary/20 shadow-soft text-center">
+              <p className="text-xs font-serif text-muted-foreground uppercase tracking-widest mb-2">the inquiry</p>
+              <p className="text-sm font-serif text-primary font-medium leading-relaxed italic">
+                &ldquo;{circle.inquiry}&rdquo;
+              </p>
+            </div>
+
+            {!carryOpen ? (
+              <div className="flex justify-center">
+                <button
+                  onClick={() => setCarryOpen(true)}
+                  className="font-serif text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4"
+                >
+                  carry this inquiry forward →
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-2 p-4 rounded-xl border border-border bg-gradient-subtle shadow-soft">
+                <p className="text-xs font-serif text-muted-foreground text-center uppercase tracking-widest">
+                  new circle method
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setCarryMethod("timing")}
+                    className={`flex-1 py-2 rounded-lg font-serif text-sm border transition-colors ${
+                      carryMethod === "timing"
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "border-border text-muted-foreground"
+                    }`}
+                  >
+                    timing
+                  </button>
+                  <button
+                    onClick={() => setCarryMethod("seeds")}
+                    className={`flex-1 py-2 rounded-lg font-serif text-sm border transition-colors ${
+                      carryMethod === "seeds"
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "border-border text-muted-foreground"
+                    }`}
+                  >
+                    seeds
+                  </button>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setCarryOpen(false)}
+                    className="flex-1 py-2 rounded-lg font-serif text-sm border border-border text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    cancel
+                  </button>
+                  <button
+                    onClick={handleCarryForward}
+                    disabled={carrying}
+                    className="flex-1 py-2 rounded-lg bg-primary text-primary-foreground font-serif text-sm disabled:opacity-60 hover:opacity-90 transition-opacity"
+                  >
+                    {carrying ? "creating…" : "begin"}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -665,14 +811,14 @@ export default function CirclePage({ params }: { params: Promise<{ id: string }>
         {circle.fragments.length > 0 && (
           <details className="rounded-xl border border-border bg-gradient-subtle shadow-soft">
             <summary className="px-4 py-3 text-xs font-serif text-muted-foreground uppercase tracking-widest cursor-pointer">
-              the collection ({circle.fragments.length} fragment{circle.fragments.length !== 1 ? "s" : ""})
+              the seeds ({circle.fragments.length})
             </summary>
-            <div className="px-4 pb-4 space-y-3">
+            <div className="px-4 pb-4 space-y-4 pt-2">
               {circle.fragments.map((f, i) => (
-                <div key={i} className="space-y-0.5">
+                <div key={i} className="space-y-1.5">
                   <p className="text-sm font-serif text-foreground leading-relaxed">{f.text}</p>
-                  <p className="text-xs font-serif text-muted-foreground">
-                    — {f.author ?? "anonymous"} · {relativeTime(f.addedAt)}
+                  <p className="text-[11px] font-serif text-muted-foreground/60">
+                    {f.author ? f.author : "anonymous"}
                   </p>
                 </div>
               ))}
