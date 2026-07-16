@@ -20,21 +20,20 @@ export function SeedMethod({ onContinue, onBack, onSkip }: SeedMethodProps) {
           <p className="text-foreground/80 font-serif">
             We present two methods for casting the I Ching: the traditional seed method, and a digital method. 
             The creator of a circle sets the method for that circle, so everyone in the circle will use the same method. 
-            If casting an individual thread, you can choose for which method resonates most in the moment.
+            If casting an individual thread, you can choose which method resonates most in the moment.
           </p>
           <h3 className="text-lg font-serif font-medium text-primary">
             Pinch Technique
           </h3>
           <p className="text-foreground/80 font-serif">
             The core action: focused, contemplative gathering of piles of seeds in a flow
-            state. Take each pinch with thumb, index, and middle fingers (other
-            fingers supporting).
+            state. Take each pinch with thumb, index, and middle fingers.
           </p>
           <ul className="text-foreground/80 font-serif space-y-2 ml-6">
             <li>Not too small, not too large</li>
             <li>Relaxed, without stress</li>
             <li>Gentle, slow, rhythmic movements</li>
-            <li>Maintain attention on the shared inquiry</li>
+            <li>Maintain attention on the inquiry</li>
           </ul>
         </div>
 
@@ -58,7 +57,7 @@ export function SeedMethod({ onContinue, onBack, onSkip }: SeedMethodProps) {
                 <span className="inline-block w-3 h-0.5 bg-primary rounded-full" />
               </span>
             </li>
-            <li>Line 1 at bottom, counting up to Line 6 at top</li>
+            <li>Line 1 at the bottom, counting up to Line 6 at the top</li>
           </ul>
         </div>
 
@@ -72,7 +71,8 @@ export function SeedMethod({ onContinue, onBack, onSkip }: SeedMethodProps) {
           </p>
           <ul className="text-foreground/80 font-serif space-y-2 ml-6">
             <li>Count seeds in 7th pile</li>
-            <li>Divide by 6, remainder = changing line</li>
+            <li>Divide that number by 6</li>
+            <li>The <b>remainder</b> is the changing line</li>
             <li>If remainder is 0, changing line is 6</li>
           </ul>
         </div>

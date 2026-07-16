@@ -55,6 +55,7 @@ export default function CirclePage({ params }: { params: Promise<{ id: string }>
   const [seedNumbers, setSeedNumbers] = useState<string[]>(["", "", "", "", "", "", ""]);
   const [submitting, setSubmitting] = useState(false);
   const [castDone, setCastDone] = useState(false);
+  const [castError, setCastError] = useState<string | null>(null);
 
   // Copy link state
   const [copied, setCopied] = useState(false);
@@ -186,10 +187,11 @@ export default function CirclePage({ params }: { params: Promise<{ id: string }>
   }
 
   async function submitNumbers(numbers: number[]) {
-    if (!deviceId) return;
+    if (!deviceId || myParticipant || castDone) return;
     setSubmitting(true);
+    setCastError(null);
     try {
-      await fetch(`/api/circle/${id}`, {
+      const res = await fetch(`/api/circle/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -199,6 +201,12 @@ export default function CirclePage({ params }: { params: Promise<{ id: string }>
           numbers,
         }),
       });
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        setCastError(data?.error ?? "Cast could not be submitted.");
+        await fetchCircle();
+        return;
+      }
       setCastDone(true);
       await fetchCircle();
     } finally {
@@ -264,6 +272,7 @@ export default function CirclePage({ params }: { params: Promise<{ id: string }>
   }
 
   const myParticipant = circle.participants.find((p) => p.deviceId === deviceId);
+  const hasSubmittedCast = Boolean(myParticipant) || castDone;
 
   const NAV_LABELS: Record<View, string> = {
     neighbourhood: "now",
@@ -580,7 +589,7 @@ export default function CirclePage({ params }: { params: Promise<{ id: string }>
               your cast
             </p>
 
-            {!castDone ? (
+            {!hasSubmittedCast ? (
               <>
                 <div className="flex gap-2 items-center">
                   <input
@@ -635,21 +644,20 @@ export default function CirclePage({ params }: { params: Promise<{ id: string }>
                     </button>
                   </div>
                 )}
+                {castError && (
+                  <p className="text-xs font-serif text-destructive text-center">
+                    {castError}
+                  </p>
+                )}
               </>
             ) : (
               <div className="text-center space-y-2 py-4">
                 <p className="font-serif text-primary">Cast submitted.</p>
                 {myParticipant && (
                   <p className="text-xs font-serif text-muted-foreground">
-                    You can re-submit any time to update your numbers.
+                    This cast is final for this circle.
                   </p>
                 )}
-                <button
-                  onClick={() => setCastDone(false)}
-                  className="text-xs font-serif text-muted-foreground underline underline-offset-4"
-                >
-                  re-cast
-                </button>
               </div>
             )}
           </div>

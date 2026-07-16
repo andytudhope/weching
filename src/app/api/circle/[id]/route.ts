@@ -93,17 +93,20 @@ export async function PATCH(
     }
     const participants = JSON.parse(row.participants) as CircleParticipant[];
     const idx = participants.findIndex((p) => p.deviceId === body.deviceId);
+    if (idx >= 0) {
+      return NextResponse.json(
+        { error: "This device has already submitted a cast." },
+        { status: 409 }
+      );
+    }
+
     const entry: CircleParticipant = {
       deviceId: body.deviceId,
       name: body.name?.trim() || undefined,
       numbers: body.numbers,
       submittedAt: Date.now(),
     };
-    if (idx >= 0) {
-      participants[idx] = entry;
-    } else {
-      participants.push(entry);
-    }
+    participants.push(entry);
     db.prepare("UPDATE circles SET participants = ? WHERE id = ?").run(
       JSON.stringify(participants),
       id

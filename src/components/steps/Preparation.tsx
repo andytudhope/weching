@@ -25,9 +25,9 @@ export function Preparation({ onContinue, onBack, onSkip }: PreparationProps) {
             from outside distractions. Shut off devices and notifications.
           </p>
           <p className="text-foreground/80 font-serif">
-            Set up an altar — a flat space with cloth to prevent seeds from
+            Set up an altar: a flat space with cloth to prevent seeds from
             rolling or mixing. Decorate with meaningful objects: crystals,
-            stones, driftwood, or natural pieces.
+            stones, driftwood. We recommend natural items.
           </p>
         </div>
 
@@ -37,7 +37,7 @@ export function Preparation({ onContinue, onBack, onSkip }: PreparationProps) {
           </h3>
           <p className="text-foreground/80 font-serif">
             Prepare a small dish with seeds approximately the size of rice
-            grains. Rice can works. Some of us prefer coriander seeds. 
+            grains. Rice works. Some of us prefer coriander seeds. 
             Any seeds that are easy to manipulate and count will work.
           </p>
           <p className="text-foreground/80 font-serif">

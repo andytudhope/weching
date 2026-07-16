@@ -60,19 +60,17 @@ const LINE_LABELS = [
   "The Changing Line",
 ];
 
-type View = "list" | "inquiry" | "ready" | "holding" | "revealed" | "complete" | "seeds" | "seeds-complete";
+type View = "list" | "inquiry" | "ready" | "holding" | "revealed" | "complete" | "seeds" | "seeds-complete" | "saved-detail";
 
 interface TimingRitualProps {
   readings: TemporalReading[];
-  onSave: (reading: Omit<TemporalReading, "id">) => Promise<void>;
-  onRemove: (id: string) => Promise<void>;
+  onSave: (reading: Omit<TemporalReading, "id">) => Promise<TemporalReading>;
   onNext: () => void;
 }
 
 export function TimingRitual({
   readings,
   onSave,
-  onRemove,
   onNext,
 }: TimingRitualProps) {
   const today = new Date();
@@ -87,6 +85,7 @@ export function TimingRitual({
   const [date, setDate] = useState(todayString());
   const [label, setLabel] = useState("");
   const [saving, setSaving] = useState(false);
+  const [savedReading, setSavedReading] = useState<TemporalReading | null>(null);
 
   // Method selection & seed inputs
   const [method, setMethod] = useState<"timing" | "seeds">("timing");
@@ -104,14 +103,6 @@ export function TimingRitual({
   }
 
   function startRitual() {
-    clearAdvanceTimer();
-    setDurations([]);
-    setLineIndex(0);
-    setView("ready");
-  }
-
-  function retry() {
-    // Re-cast with same inquiry
     clearAdvanceTimer();
     setDurations([]);
     setLineIndex(0);
@@ -154,7 +145,7 @@ export function TimingRitual({
     setSaving(true);
     try {
       const { lines, changingLine } = derivedFromDurations(completeDurations);
-      await onSave({
+      const saved = await onSave({
         date,
         inquiry: inquiry.trim() || undefined,
         label: label.trim() || undefined,
@@ -164,10 +155,11 @@ export function TimingRitual({
       });
       setDurations([]);
       setLineIndex(0);
+      setSavedReading(saved);
       setInquiry("");
       setLabel("");
       setDate(todayString());
-      setView("list");
+      setView("saved-detail");
     } finally {
       setSaving(false);
     }
@@ -177,7 +169,7 @@ export function TimingRitual({
     setSaving(true);
     try {
       const { lines, changingLine } = derivedFromSeeds(seeds);
-      await onSave({
+      const saved = await onSave({
         date,
         inquiry: inquiry.trim() || undefined,
         label: label.trim() || undefined,
@@ -185,13 +177,19 @@ export function TimingRitual({
         changingLine,
       });
       setSeedInputs(["", "", "", "", "", "", ""]);
+      setSavedReading(saved);
       setInquiry("");
       setLabel("");
       setDate(todayString());
-      setView("list");
+      setView("saved-detail");
     } finally {
       setSaving(false);
     }
+  }
+
+  function returnToNeighbourhood() {
+    setSavedReading(null);
+    setView("list");
   }
 
   // ——— Views ———
@@ -232,12 +230,6 @@ export function TimingRitual({
                       </p>
                     )}
                   </div>
-                  <button
-                    onClick={() => onRemove(r.id)}
-                    className="text-xs font-serif text-muted-foreground hover:text-destructive transition-colors shrink-0"
-                  >
-                    remove
-                  </button>
                 </div>
               );
             })}
@@ -581,16 +573,94 @@ export function TimingRitual({
             hexagramUrl={sInfo.url}
           />
         </div>
-        <div className="flex justify-center gap-4">
-          <Button variant="outline" onClick={() => setView("seeds")} className="font-serif">
-            Try Again
-          </Button>
+        <div className="flex justify-center">
           <Button
             onClick={() => handleAcceptSeeds(finalSeeds)}
             disabled={saving}
             className="font-serif shadow-warm"
           >
             {saving ? "Saving…" : "Accept & Save"}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // ——— SAVED DETAIL ———
+  if (view === "saved-detail" && savedReading) {
+    const savedInfo = getHexagramInfo(savedReading.lines);
+    const changedLines = savedReading.changingLine
+      ? savedReading.lines.map((line, index) =>
+          index === savedReading.changingLine! - 1 ? !line : line
+        )
+      : null;
+    const changedInfo = changedLines ? getHexagramInfo(changedLines) : null;
+
+    return (
+      <div className="max-w-lg mx-auto w-full space-y-6 px-4">
+        <div className="text-center space-y-2">
+          <p className="text-sm font-serif text-muted-foreground uppercase tracking-widest">
+            reading saved
+          </p>
+          <h3 className="text-2xl font-serif font-semibold text-primary">
+            Hexagram {savedInfo.number}: {savedInfo.name}
+          </h3>
+          {savedReading.inquiry && (
+            <p className="text-sm font-serif text-foreground/60 italic">
+              &ldquo;{savedReading.inquiry}&rdquo;
+            </p>
+          )}
+        </div>
+
+        <div className="flex justify-center">
+          <HexagramDisplay
+            lines={savedReading.lines}
+            title={`Hexagram ${savedInfo.number}`}
+            changingLine={savedReading.changingLine !== null ? savedReading.changingLine - 1 : -1}
+            hexagramNumber={savedInfo.number}
+            hexagramName={savedInfo.name}
+            hexagramUrl={savedInfo.url}
+          />
+        </div>
+
+        {savedReading.changingLine && changedLines && changedInfo && (
+          <div className="rounded-2xl border border-border bg-gradient-subtle p-5 shadow-soft space-y-4 text-center">
+            <div className="space-y-1">
+              <p className="text-xs font-serif text-muted-foreground uppercase tracking-widest">
+                changing line {savedReading.changingLine} points toward
+              </p>
+              <a
+                href={changedInfo.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-serif text-primary hover:text-accent underline underline-offset-2 transition-colors"
+              >
+                Hexagram {changedInfo.number}: {changedInfo.name}
+              </a>
+            </div>
+            <div className="flex justify-center">
+              <HexagramDisplay
+                lines={changedLines}
+                title=""
+                changingLine={-1}
+                compact
+              />
+            </div>
+          </div>
+        )}
+
+        <div className="rounded-2xl border border-border/40 bg-meditation-glow p-5 text-center">
+          <p className="text-sm font-serif text-foreground/70 leading-relaxed">
+            Follow the hexagram link, sit with the oracle&apos;s response, and return when you are ready.
+          </p>
+        </div>
+
+        <div className="flex justify-center">
+          <Button
+            onClick={returnToNeighbourhood}
+            className="font-serif shadow-warm hover:shadow-meditation transition-all duration-300"
+          >
+            Return to Neighbourhood of Now
           </Button>
         </div>
       </div>
@@ -628,10 +698,7 @@ export function TimingRitual({
         />
       </div>
 
-      <div className="flex justify-center gap-4">
-        <Button variant="outline" onClick={retry} className="font-serif">
-          Try Again
-        </Button>
+      <div className="flex justify-center">
         <Button
           onClick={() => handleAccept(durations)}
           disabled={saving}

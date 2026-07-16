@@ -21,7 +21,6 @@ type ThreadAction =
   | { type: "GO_TO_STEP"; step: number }
   | { type: "SET_READINGS"; readings: TemporalReading[] }
   | { type: "ADD_READING"; reading: TemporalReading }
-  | { type: "REMOVE_READING"; id: string }
   | { type: "SET_USERNAME"; username: string };
 
 function threadReducer(
@@ -39,11 +38,6 @@ function threadReducer(
       return { ...state, readings: action.readings };
     case "ADD_READING":
       return { ...state, readings: [...state.readings, action.reading] };
-    case "REMOVE_READING":
-      return {
-        ...state,
-        readings: state.readings.filter((r) => r.id !== action.id),
-      };
     case "SET_USERNAME":
       return { ...state, username: action.username };
     default:
@@ -82,7 +76,7 @@ export default function ThreadPage() {
     init();
   }, [router]);
 
-  async function handleSave(reading: Omit<TemporalReading, "id">) {
+  async function handleSave(reading: Omit<TemporalReading, "id">): Promise<TemporalReading> {
     const res = await fetch("/api/readings", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -97,15 +91,11 @@ export default function ThreadPage() {
     });
     if (res.ok) {
       const { id } = await res.json();
-      dispatch({ type: "ADD_READING", reading: { ...reading, id } });
+      const savedReading = { ...reading, id };
+      dispatch({ type: "ADD_READING", reading: savedReading });
+      return savedReading;
     }
-  }
-
-  async function handleRemove(id: string) {
-    const res = await fetch(`/api/readings/${id}`, { method: "DELETE" });
-    if (res.ok) {
-      dispatch({ type: "REMOVE_READING", id });
-    }
+    throw new Error("Reading could not be saved.");
   }
 
   async function handleLogout() {
@@ -138,7 +128,6 @@ export default function ThreadPage() {
             <TimingRitual
               readings={readings}
               onSave={handleSave}
-              onRemove={handleRemove}
               onNext={() => dispatch({ type: "NEXT_STEP" })}
             />
           </div>

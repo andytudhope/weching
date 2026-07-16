@@ -26,8 +26,8 @@ export function FormingTheQuestion({
         </p>
 
         <p className="text-foreground/80 font-serif">
-          This inquiry is the heart of the ritual. Everything that follows — the
-          seeds, the counting, the hexagram — serves as a response to the
+          This inquiry is the heart of the ritual. The
+          seeds, the counting, the hexagram (really everything that follows) serves as a response to the
           question you bring. Give this step the time it deserves.
         </p>
 
@@ -37,11 +37,11 @@ export function FormingTheQuestion({
             The Process
           </h3>
           <p className="text-foreground/80 font-serif">
-            Handwrite your individual inquiry in a journal, whether starting an indivual thread, or a group circle. 
+            Handwrite your personal inquiry in a journal, whether starting an indivual thread, or a group circle. 
             If creating a circle, share and discuss to form a collective question.
           </p>
           <p className="text-foreground/80 font-serif">
-            The group process is intentionally messy and non-linear — conversation and
+            The group process is intentionally messy and non-linear. Conversation and
             synthesis are key. This app will keep your fragments, reflections, thoughts 
             and questions safe untul you have reached a good enough question that the whole 
             group is happy to put to the I Ching.

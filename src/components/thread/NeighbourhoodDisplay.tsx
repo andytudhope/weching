@@ -211,7 +211,7 @@ export function NeighbourhoodDisplay({ today }: NeighbourhoodDisplayProps) {
           the neighbourhood of now
         </h3>
         <p className="text-xs font-serif text-muted-foreground mt-1">
-          The I Ching&apos;s 64 hexagrams form a 6-dimensional hypercube — a space of possible states.
+          The I Ching&apos;s 64 hexagrams form a 6-dimensional hypercube. It is a space of possible states.
           The King Wen sequence traces a specific path through it. This display shows
           where that cycle stands today, in digital time, as an aid to sensing the current moment and crafting an
           enquiry resonant with it.
@@ -318,23 +318,12 @@ export function NeighbourhoodDisplay({ today }: NeighbourhoodDisplayProps) {
 
         {expanded && (
           <div className="px-5 pb-6 space-y-4 text-xs font-serif text-foreground/70 leading-relaxed border-t border-border/20">
-            <p className="pt-3">
-              <strong className="text-primary">Hexagram space.</strong>{" "}
-              Each hexagram is a point in a 6-dimensional binary space — a hypercube of 64 vertices,
-              one per combination of six yin/yang lines. The distance between any two hexagrams is
-              their Hamming distance: how many lines differ. Crucially, every hexagram is simultaneously
-              a <em>state</em> (where you are in the space) and an <em>operator</em> (a transformation
-              that can move any state to another, via bitwise XOR). The coloured dots above show
-              exactly which lines the current transition changes:
-              {" "}<span className="text-amber-600 font-medium">amber = lower trigram (lines 1–3)</span>,
-              {" "}<span className="text-sky-600 font-medium">blue = upper trigram (lines 4–6)</span>.
-            </p>
 
             <p>
               <strong className="text-primary">Lower and upper trigrams.</strong>{" "}
               Each hexagram is composed of two trigrams of three lines. The lower trigram (lines 1–3)
-              is traditionally the inner world — your own state, what arises from within. The upper
-              (lines 4–6) is the outer world — circumstances, environment, what comes from outside.
+              is traditionally the inner world: your own state, what arises from within. The upper
+              (lines 4–6) is the outer world: circumstances, environment, what comes from outside.
               When today&apos;s transition moves only in the lower trigram, inner conditions are in motion
               while the outer situation holds. When only the upper, the outer is in flux. When both,
               the shift is comprehensive. The prose description above tells you which it is today.
@@ -342,10 +331,21 @@ export function NeighbourhoodDisplay({ today }: NeighbourhoodDisplayProps) {
 
             <p>
               <strong className="text-primary">The King Wen sequence.</strong>{" "}
-              The I Ching&apos;s traditional arrangement of 64 hexagrams — attributed to King Wen —
-              traces a specific path through this hypercube, visiting each vertex exactly once (a
+              The I Ching&apos;s traditional arrangement of 64 hexagrams (attributed to King Wen)
+              traces a specific path through hexagram space, visiting each vertex exactly once (a
               Hamiltonian path). The First Order of Difference (FOD) at each step is the number of
               lines that change. {getFodDistributionSummary()}
+            </p>
+
+            <p className="pt-3">
+              <strong className="text-primary">Hexagram space.</strong>{" "}
+              Each hexagram is a point in a 6-dimensional. space. It can be seens as a hypercube 
+              with 64 corners. The "distance" between any two hexagrams is defined by how many lines differ. 
+              Crucially, every hexagram is simultaneously a <em>state</em> (where you are in the space) 
+              and an <em>operator</em> (a transformation that can move any state to another, via bitwise XOR). 
+              The coloured dots above show exactly which lines the current transition changes:
+              {" "}<span className="text-amber-600 font-medium">amber = lower trigram (lines 1–3)</span>,
+              {" "}<span className="text-sky-600 font-medium">blue = upper trigram (lines 4–6)</span>.
             </p>
 
             <div className="pt-1">
@@ -354,8 +354,8 @@ export function NeighbourhoodDisplay({ today }: NeighbourhoodDisplayProps) {
 
             <p>
               <strong className="text-primary">Why 384 days.</strong>{" "}
-              There are 64 transitions in the King Wen sequence. Assigning 6 days to each — resonant
-              with the hexagram having 6 lines — gives 64 × 6 = 384 days per full cycle. This is
+              There are 64 transitions in the King Wen sequence. Assigning 6 days to each (resonant
+              with the hexagram having 6 lines) gives 64 × 6 = 384 days per full cycle. This is
               not a solar year (~365 days), so the cycle drifts through the seasons: it is its own
               rhythm, independent of the sun. The bar heights in the sequence strip above show the
               FOD (1 = short, 6 = tall) for each nearby pair; the colours show which trigram is active.
@@ -363,9 +363,9 @@ export function NeighbourhoodDisplay({ today }: NeighbourhoodDisplayProps) {
 
             <p>
               <strong className="text-primary">Why January 1, 1970.</strong>{" "}
-              The Unix epoch — midnight January 1, 1970 UTC — is the foundational time standard of
+              The Unix epoch (midnight January 1, 1970 UTC) is the foundational time standard of
               digital systems worldwide. Since this reading is conducted in digital media, anchoring
-              the cycle to the Unix epoch is coherent, transparent, and honest about its arbitrariness.
+              the cycle to the Unix epoch is one way to be honest about the arbitrariness of any choice.
               It is not an eschatological date, not a countdown to anything, not predictive. The cycle
               repeats indefinitely. Its purpose is not to tell you what will happen, but to describe
               the structural quality of the transitions that characterize this moment in the sequence.

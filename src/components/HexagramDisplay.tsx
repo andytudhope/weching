@@ -58,9 +58,6 @@ export function HexagramDisplay({
                     <div className={`w-[44%] ${lineClass}`} />
                   </div>
                 )}
-                {isChanging && (
-                  <div className="absolute -right-8 top-0 w-2 h-2 bg-accent rounded-full animate-pulse" />
-                )}
               </div>
             </div>
           );

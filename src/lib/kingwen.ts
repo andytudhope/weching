@@ -182,9 +182,9 @@ export function describeNeighbourhood(neighbourhood: TemporalTexture[]): string 
   // Quality sentence
   const qualityDesc: Record<string, string> = {
     identity: "",
-    surgical: "A single line moves — precise, discerning.",
-    moderate: `${todayFod} lines shift — gradual, steady movement.`,
-    substantial: `${todayFod} lines shift — substantial transformation, much in motion.`,
+    surgical: "A single line moves: precise, discerning.",
+    moderate: `${todayFod} lines shift: gradual, steady movement.`,
+    substantial: `${todayFod} lines shift: substantial transformation, much in motion.`,
     total: "",
   };
 

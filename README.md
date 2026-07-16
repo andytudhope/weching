@@ -1,36 +1,28 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# weching
 
-## Getting Started
+This app presents a way to approach the I Ching as co-inquiry. It offers two collective paths: a circle, where a group forms a shared question and casts together; and a thread, where one person returns over time as many selves, each moment receiving its own hexagram.
 
-First, run the development server:
+We do not treat the I Ching as a prediction machine. This is about the natural rhythm of our living inquiries; about how we ask and how we learn to receive. It is a [conversation between modern humanity and our ancestors about that which we know, and that which we wish to know](https://youtu.be/CCYw0QVoB_U?t=1261). 
+
+A circle gathers many people in one moment; a thread gathers many moments in one life. Both are records of relation, movement, and attention.
+
+Learn more:
+
+- [HISTORY](./HISTORY.md)
+- [BOUNDARIES](./BOUNDARIES.md)
+- [FUXI](./FUXI.md)
+
+## Run Locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+```text
+http://localhost:3000
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm test
+```

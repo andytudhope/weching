@@ -24,15 +24,15 @@ export function ThreadWelcome({ onBegin, username }: ThreadWelcomeProps) {
         <div className="space-y-5 text-base text-foreground/80 font-serif leading-relaxed max-w-lg mx-auto">
           <p>
             This is a different kind of collective reading. The participants are
-            your many selves at different moments — each with its own question,
+            your many selves at different moments, each with its own question,
             each receiving its own hexagram.
           </p>
           <p>
             The I Ching is not consulted here as a prediction machine. It is
             approached as an operator: the hexagram you receive describes the
             structural quality of your inquiry at this moment. Across time, the
-            sequence of hexagrams traces a path through a 64-dimensional space
-            — and that path has its own geometry.
+            sequence of hexagrams traces a path through a 64-dimensional space. 
+            That path has its own geometry.
           </p>
           <p>
             Your thread is not oriented toward an outcome. It is a record of
